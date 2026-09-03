@@ -3,6 +3,7 @@ package com.example.ia_cs.services;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CancelAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.ChangeAppointmentRequestDTO;
+import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateMedicalRequestDTO;
 import com.example.ia_cs.dataTransferObjects.PeriodicUpdateDTOs.RescheduledAppointmentDTO;
 import com.example.ia_cs.entities.*;
 import com.example.ia_cs.repositories.AppointmentRepository;
@@ -27,6 +28,7 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final List<RescheduledAppointmentDTO> rescheduledAppointmentsDTOs = new ArrayList<>();
+    private final MedicalRecordService medicalRecordService;
 
 
     public void addToRescheduledAppointmentsList(RescheduledAppointmentDTO rescheduledAppointmentDTO){
@@ -37,11 +39,12 @@ public class AppointmentService {
         rescheduledAppointmentsDTOs.remove(rescheduledAppointmentDTO);
     }
 
-    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository){
+    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, MedicalRecordService medicalRecordService){
         this.appointmentRepository=appointmentRepository;
         this.vacationRequestRepository = vacationRequestRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
+        this.medicalRecordService = medicalRecordService;
     }
 
     public Appointment requestAppointment(CreateAppointmentRequestDTO request, long userID){
@@ -141,5 +144,14 @@ public class AppointmentService {
             }
         }
         return result;
+    }
+
+    public MedicalRecord addMedicalRecord(CreateMedicalRequestDTO createMedicalRequestDTO){
+        Optional<Patient> optionalPatient = patientRepository.getByPatientID(createMedicalRequestDTO.getPatientID());
+        if (optionalPatient.isEmpty()){
+            throw new RuntimeException("Patient not found");
+        }
+        Patient patient = optionalPatient.get();
+        return medicalRecordService.addMedicalRecord(patient, createMedicalRequestDTO.getDate(), createMedicalRequestDTO.getDescription());
     }
 }

@@ -1,26 +1,36 @@
 package com.example.ia_cs.services;
 
+import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateMedicalRecordDTO;
 import com.example.ia_cs.entities.MedicalRecord;
 import com.example.ia_cs.entities.Patient;
 import com.example.ia_cs.repositories.MedicalRecordRepository;
+import com.example.ia_cs.repositories.PatientRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class MedicalRecordService {
 
     private final MedicalRecordRepository medicalRecordRepository;
+    private final PatientRepository patientRepository;
 
-    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository) {
+    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository, PatientRepository patientRepository) {
         this.medicalRecordRepository = medicalRecordRepository;
+        this.patientRepository = patientRepository;
     }
 
-    public MedicalRecord addMedicalRecord(Patient patient, LocalDate date, String description){
+    public MedicalRecord addMedicalRecord(CreateMedicalRecordDTO createMedicalRecordDTO){
+        Optional<Patient> optionalPatient = patientRepository.getByPatientID(createMedicalRecordDTO.getPatientID());
+        if (optionalPatient.isEmpty()){
+            throw new RuntimeException("Patient not found");
+        }
+        Patient patient = optionalPatient.get();
+
         MedicalRecord medicalRecord = new MedicalRecord();
         medicalRecord.setPatient(patient);
-        medicalRecord.setRecordDate(date);
-        medicalRecord.setDescription(description);
+        medicalRecord.setRecordDate(createMedicalRecordDTO.getDate());
+        medicalRecord.setDescription(createMedicalRecordDTO.getDescription());
         medicalRecordRepository.save(medicalRecord);
         return medicalRecord;
     }

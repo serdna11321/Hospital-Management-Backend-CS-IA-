@@ -3,7 +3,6 @@ package com.example.ia_cs.services;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CancelAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.ChangeAppointmentRequestDTO;
-import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateMedicalRequestDTO;
 import com.example.ia_cs.dataTransferObjects.PeriodicUpdateDTOs.RescheduledAppointmentDTO;
 import com.example.ia_cs.entities.*;
 import com.example.ia_cs.repositories.AppointmentRepository;
@@ -144,14 +143,5 @@ public class AppointmentService {
             }
         }
         return result;
-    }
-
-    public MedicalRecord addMedicalRecord(CreateMedicalRequestDTO createMedicalRequestDTO){
-        Optional<Patient> optionalPatient = patientRepository.getByPatientID(createMedicalRequestDTO.getPatientID());
-        if (optionalPatient.isEmpty()){
-            throw new RuntimeException("Patient not found");
-        }
-        Patient patient = optionalPatient.get();
-        return medicalRecordService.addMedicalRecord(patient, createMedicalRequestDTO.getDate(), createMedicalRequestDTO.getDescription());
     }
 }

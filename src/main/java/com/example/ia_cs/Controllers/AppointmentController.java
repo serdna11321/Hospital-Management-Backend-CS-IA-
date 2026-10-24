@@ -6,13 +6,13 @@ import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.ChangeApp
 import com.example.ia_cs.entities.Appointment;
 import com.example.ia_cs.services.AppointmentService;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
 
-@RestController
-@RequestMapping("/api/appointments")
+@Controller
+@RequestMapping("/appointments")
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
@@ -21,23 +21,31 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
-    @PostMapping
-    public ResponseEntity<Appointment> requestNewAppointment(@RequestBody CreateAppointmentRequestDTO request, Authentication authentication){
+    @GetMapping
+    public String showAppointmentsPage(Model model){
+        model.addAttribute("createRequest", new CreateAppointmentRequestDTO());
+        model.addAttribute("changeRequest", new ChangeAppointmentRequestDTO());
+        model.addAttribute("cancelRequest",new CancelAppointmentRequestDTO());
+        return "appointments/index";
+    }
+
+    @PostMapping("/create")
+    public String requestNewAppointment(@ModelAttribute("createRequest") CreateAppointmentRequestDTO request, Authentication authentication){
         Jwt jwt = (Jwt) authentication.getPrincipal();
         long userID = jwt.getClaim("userID");
         Appointment appointment = appointmentService.requestAppointment(request, userID);
-        return ResponseEntity.status(HttpStatus.CREATED).body(appointment);
+        return "redirect:/appointments";
     }
 
-    @PutMapping
-    public ResponseEntity<Appointment> updateAppointment(@RequestBody ChangeAppointmentRequestDTO request, Authentication authentication){
+    @PutMapping("/update")
+    public String updateAppointment(@ModelAttribute("changeRequest") ChangeAppointmentRequestDTO request, Authentication authentication){
         Appointment appointment = appointmentService.changeAppointmentDateTime(request);
-        return ResponseEntity.status(HttpStatus.OK).body(appointment);
+        return "redirect:/appointments";
     }
 
-    @PutMapping
-    public ResponseEntity<Appointment> cancelAppointment(@RequestBody CancelAppointmentRequestDTO request){
+    @PutMapping("/cancel")
+    public String cancelAppointment(@ModelAttribute("cancelRequest") CancelAppointmentRequestDTO request){
         Appointment appointment = appointmentService.cancelAppointment(request);
-        return ResponseEntity.status(HttpStatus.OK).body(appointment);
+        return "redirect:/appointments";
     }
 }

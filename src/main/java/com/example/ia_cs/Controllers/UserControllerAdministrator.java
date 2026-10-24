@@ -5,12 +5,12 @@ import com.example.ia_cs.services.UserService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.ui.Model;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/users/administrators")
+@Controller
+@RequestMapping("/user/administrators")
 public class UserControllerAdministrator {
 
     private final UserService userService;
@@ -19,15 +19,22 @@ public class UserControllerAdministrator {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<DoctorDTO> createDoctorAccount(@RequestBody CreateDoctorRequestDTO request){
-        DoctorDTO doctorDTO = userService.createDoctorAccount(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(doctorDTO);
+    @GetMapping
+    public String showAdministratorUser(Model model){
+        model.addAttribute("createDoctor", new CreateDoctorRequestDTO());
+        model.addAttribute("createAdmin", new CreateAdministratorRequestDTO());
+        return "user/administrators/index";
     }
 
-    @PostMapping
-    public ResponseEntity<AdministratorDTO> createAdministratorAccount(@RequestBody CreateAdministratorRequestDTO request){
-        AdministratorDTO administratorDTO = userService.createAdministratorAccount(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(administratorDTO);
+    @PostMapping("/createDoctor")
+    public String createDoctorAccount(@ModelAttribute("/createDoctor") CreateDoctorRequestDTO request){
+        userService.createDoctorAccount(request);
+        return "redirect:/user/administrators";
+    }
+
+    @PostMapping("/createAdmin")
+    public String createAdministratorAccount(@ModelAttribute("/createAdmin") CreateAdministratorRequestDTO request){
+        userService.createAdministratorAccount(request);
+        return "redirect:/user/administrators";
     }
 }

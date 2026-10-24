@@ -1,41 +1,58 @@
 package com.example.ia_cs.Controllers;
 
-import com.example.ia_cs.Configuration.SecurityConfiguration;
 import com.example.ia_cs.dataTransferObjects.AuthControllerDTOs.LoginRequestDTO;
-import com.example.ia_cs.dataTransferObjects.AuthControllerDTOs.LoginResponseDTO;
-import com.example.ia_cs.repositories.UserRepository;
 import com.example.ia_cs.services.JwtService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/authentication")
+@Controller
+@RequestMapping("/authentication")
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
 
-    public AuthenticationController(SecurityConfiguration securityConfiguration, AuthenticationConfiguration authenticationConfiguration, AuthenticationManager authenticationManager, JwtService jwtService, UserRepository userRepository) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
+    }
+
+    @GetMapping
+    public String showAuthenticationPage(Model model) {
+        model.addAttribute("login", new LoginRequestDTO());
+        return "auth/login";
     }
 
     @PostMapping
-    public ResponseEntity<LoginResponseDTO> login(LoginRequestDTO request) throws Exception {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        String token = jwtService.createToken(authentication);
-        LoginResponseDTO response = new LoginResponseDTO();
-        response.setToken(token);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public String login(@ModelAttribute("login") LoginRequestDTO request,
+                        HttpServletResponse response,
+                        Model model) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+            String token = jwtService.createToken(authentication);
 
+            Cookie jwtCookie = new Cookie("JWT_TOKEN", token);
+            jwtCookie.setHttpOnly(true);  // Prevents XSS script access
+            jwtCookie.setSecure(false);   // Set to true if using HTTPS
+            jwtCookie.setPath("/");       // Available across the entire application
+            jwtCookie.setMaxAge(86400);   // Expiration in seconds (1 day)
+
+            response.addCookie(jwtCookie);
+
+            return "redirect:/dashboard";
+
+        } catch (AuthenticationException e) {
+            model.addAttribute("error", "Invalid credentials. Please try again.");
+            return "auth/login"; // Re-render login view with error context
+        }
     }
 }

@@ -14,10 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class AppointmentService {
@@ -46,7 +43,7 @@ public class AppointmentService {
         this.medicalRecordService = medicalRecordService;
     }
 
-    public Appointment requestAppointment(CreateAppointmentRequestDTO request, long userID){
+    public void requestAppointment(CreateAppointmentRequestDTO request, long userID){
         Doctor doctor = getDoctorFromID(request.getDoctorID());
         Patient patient = patientRepository.getByUserID(userID);
         LocalDate date = request.getDate();
@@ -63,17 +60,16 @@ public class AppointmentService {
         appointment.setAppointmentTime(time);
         appointment.setStatus(AppointmentStatus.BOOKED);
 
-        return appointmentRepository.save(appointment);
+        appointmentRepository.save(appointment);
     }
 
-    public Appointment cancelAppointment(CancelAppointmentRequestDTO request){
+    public void cancelAppointment(CancelAppointmentRequestDTO request){
         Optional<Appointment> optionalAppointment = appointmentRepository.getAppointmentByAppointmentID(request.getAppointmentID());
         if (optionalAppointment.isEmpty()){
             throw new RuntimeException("Appointment does not exist");
         }
         Appointment appointment = optionalAppointment.get();
         appointment.setStatus(AppointmentStatus.CANCELLED);
-        return appointment;
     }
 
     public List<LocalDateTime> getOccupiedDateTimesFromDate(Doctor doctor, LocalDate date) {
@@ -84,7 +80,37 @@ public class AppointmentService {
         return appointments.stream().map(appointment -> LocalDateTime.of(appointment.getAppointmentDate(), appointment.getAppointmentTime())).toList();
     }
 
-    public Appointment changeAppointmentDateTime(ChangeAppointmentRequestDTO request){
+    public List<LocalDateTime> getAvailableSlots(LocalDate date, Long doctorId) {
+        List<LocalDateTime> occupiedSlots = getOccupiedDateTimesFromDate(doctorRepository.getByDoctorID(doctorId).get(), date);
+        Set<LocalDateTime> occupiedSet = new HashSet<>(occupiedSlots);
+
+        List<LocalDateTime> availableSlots = new ArrayList<>();
+
+        LocalTime workStart = LocalTime.of(9, 0);   // 9:00 AM
+        LocalTime workEnd = LocalTime.of(17, 0);   // 5:00 PM
+        int slotDurationMinutes = 30;
+
+        LocalDate currentDate = date;
+        LocalDate finalDate = date.plusDays(30);
+
+        while (!currentDate.isAfter(finalDate)){
+            LocalDateTime currentSlot = currentDate.atTime(workStart);
+            LocalDateTime endOfDay = currentDate.atTime(workEnd);
+
+            while (currentSlot.isBefore(endOfDay)) {
+                if (!occupiedSet.contains(currentSlot)) {
+                    availableSlots.add(currentSlot);
+                }
+
+                currentSlot = currentSlot.plusMinutes(slotDurationMinutes);
+            }
+            currentDate=currentDate.plusDays(1);
+        }
+
+        return availableSlots;
+    }
+
+    public void changeAppointmentDateTime(ChangeAppointmentRequestDTO request){
         Optional<Appointment> optionalAppointment = appointmentRepository.getAppointmentByAppointmentID(request.getAppointmentID());
         if (optionalAppointment.isEmpty()){
             throw new RuntimeException("Appointment does not exist");
@@ -100,23 +126,12 @@ public class AppointmentService {
             appointment.setAppointmentDate(newDate);
             appointment.setAppointmentTime(newTime);
         }
-        return appointment;
     }
 
     public Doctor getDoctorFromID(long doctorID){
         Optional<Doctor> doctor = doctorRepository.getByDoctorID(doctorID);
         if (doctor.isPresent()){
             return doctor.get();
-        }
-        else {
-            throw new RuntimeException("Doctor Not Found");
-        }
-    }
-
-    public Patient getPatientFromID(long patientID){
-        Optional<Patient> patient = patientRepository.getByPatientID(patientID);
-        if (patient.isPresent()){
-            return patient.get();
         }
         else {
             throw new RuntimeException("Doctor Not Found");

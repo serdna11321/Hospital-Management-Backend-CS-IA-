@@ -6,6 +6,8 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.security.Principal;
+
 @Component
 public class UpdateWebSocketHandler extends TextWebSocketHandler {
 
@@ -22,8 +24,15 @@ public class UpdateWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        System.out.println("User disconnected");
-        int userID = getUserId(session);
+        int userID = getUserID(session.getPrincipal());
         connectionService.addConnection(session, userID);
+    }
+
+    private int getUserID(Principal principal){
+        if(principal != null){
+            return Integer.parseInt(principal.getName());
+        }
+
+        throw new IllegalStateException("No authenticated user found");
     }
 }

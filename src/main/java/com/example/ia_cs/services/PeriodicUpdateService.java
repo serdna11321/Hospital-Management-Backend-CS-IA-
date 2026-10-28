@@ -17,7 +17,6 @@ public class PeriodicUpdateService {
     private final DoctorRepository doctorRepository;
     private final RoleRepository roleRepository;
     private final PatientRepository patientRepository;
-    private final MedicalRecordRepository medicalRecordRepository;
     private final ConnectionService connectionService;
     private static final int UPDATE_RATE = 1000*60*15;
     private final AppointmentRepository appointmentRepository;
@@ -25,12 +24,11 @@ public class PeriodicUpdateService {
     private final UserRepository userRepository;
     private final UpdateSenderService updateSenderService;
 
-    public PeriodicUpdateService(AppointmentService appointmentService, DoctorRepository doctorRepository, RoleRepository roleRepository, PatientRepository patientRepository, MedicalRecordRepository medicalRecordRepository, ConnectionService connectionService, AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, UserRepository userRepository, UpdateSenderService updateSenderService) {
+    public PeriodicUpdateService(AppointmentService appointmentService, DoctorRepository doctorRepository, RoleRepository roleRepository, PatientRepository patientRepository, ConnectionService connectionService, AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, UserRepository userRepository, UpdateSenderService updateSenderService) {
         this.appointmentService = appointmentService;
         this.doctorRepository = doctorRepository;
         this.roleRepository = roleRepository;
         this.patientRepository = patientRepository;
-        this.medicalRecordRepository = medicalRecordRepository;
         this.connectionService = connectionService;
         this.appointmentRepository = appointmentRepository;
         this.vacationRequestRepository = vacationRequestRepository;
@@ -43,23 +41,23 @@ public class PeriodicUpdateService {
         for (User user : userRepository.findAll()){
             int userID = Math.toIntExact(user.getUserID());
             if (connectionService.isConnected((Math.toIntExact(user.getUserID())))){
-                updateSenderService.sendUpdate(userID, createUpdateforUser(user));
+                updateSenderService.sendUpdate(userID, createUpdateForUser(user));
             }
         }
     }
 
-    public UpdateDTO createUpdateforUser(User user){
+    public UpdateDTO createUpdateForUser(User user){
         UpdateDTO updateDTO = new UpdateDTO();
-        if (user.getRoles().contains(roleRepository.findByRoleName(RoleName.PATIENT))){
+        if (user.getRoles().contains(roleRepository.findByName(RoleName.PATIENT))){
             updateDTO.setDoctorAvailability(prepareDoctorOccupiedDTO());
-            updateDTO.setPatientAppointments(preparePatientAppointments(patientRepository.findByUserID(user.getUserID())));
-            updateDTO.setRescheduledAppointments(appointmentService.getAndRemoveRescheduledAppointments(patientRepository.findPatientIDByUser(user)));
+            updateDTO.setPatientAppointments(preparePatientAppointments(patientRepository.findByPersonPersonID(user.getPerson().getPersonID()).get()));
+            updateDTO.setRescheduledAppointments(appointmentService.getAndRemoveRescheduledAppointments(patientRepository.findByPersonPersonID(user.getPerson().getPersonID()).get().getPatientID()));
         }
-        if (user.getRoles().contains(roleRepository.findByRoleName(RoleName.DOCTOR))){
-            updateDTO.setDoctorAppointments(prepareDoctorAppointments(doctorRepository.findByUserID(user.getUserID()).get()));
-            updateDTO.setDoctorVacationRequests(prepareDoctorVacationRequests(doctorRepository.findByUserID(user.getUserID()).get()));
+        if (user.getRoles().contains(roleRepository.findByName(RoleName.DOCTOR))){
+            updateDTO.setDoctorAppointments(prepareDoctorAppointments(doctorRepository.findByPersonPersonID(user.getPerson().getPersonID()).get()));
+            updateDTO.setDoctorVacationRequests(prepareDoctorVacationRequests(doctorRepository.findByPersonPersonID(user.getPerson().getPersonID()).get()));
         }
-        if (user.getRoles().contains(roleRepository.findByRoleName(RoleName.ADMINISTRATOR))){
+        if (user.getRoles().contains(roleRepository.findByName(RoleName.ADMINISTRATOR))){
             updateDTO.setAdministratorVacationRequests(prepareAdministratorVacationRequests());
         }
         return updateDTO;
@@ -99,7 +97,6 @@ public class PeriodicUpdateService {
             appointmentDoctorDTO.setDate(appointment.getAppointmentDate());
             appointmentDoctorDTO.setPatientName(appointment.getPatient().getFirstName());
             appointmentDoctorDTO.setTime(appointment.getAppointmentTime());
-            appointmentDoctorDTO.setMedicalRecords(medicalRecordRepository.getByPatientID(appointment.getPatient().getPatientID()));
             appointmentDoctorDTOs.add(appointmentDoctorDTO);
         }
         return appointmentDoctorDTOs;

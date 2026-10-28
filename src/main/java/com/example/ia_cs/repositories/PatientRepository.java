@@ -7,8 +7,6 @@ import com.example.ia_cs.entities.Patient;
 import java.util.Optional;
 
 public interface PatientRepository extends JpaRepository<Patient, Long> {
-    Optional<Patient> findByPersonID(long personID);
+    Optional<Patient> findByPersonPersonID(long personID);
     Optional<Patient> findByPatientID(long patientID);
-    Patient findByUserID(long userID);
-    long findPatientIDByUser(User user);
 }

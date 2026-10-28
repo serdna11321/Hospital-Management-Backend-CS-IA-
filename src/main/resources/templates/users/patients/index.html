@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Create Patient Account')}">
+    <meta charset="UTF-8">
+</head>
+<body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main>
+    <h1>Create Patient Account</h1>
+
+    <form th:action="@{/users/patients/createPatient}" th:object="${createPatient}" method="post">
+        <div>
+            <label for="firstName">First name</label>
+            <input id="firstName" type="text" th:field="*{firstName}" required/>
+        </div>
+
+        <div>
+            <label for="lastName">Last name</label>
+            <input id="lastName" type="text" th:field="*{lastName}" required/>
+        </div>
+
+        <div>
+            <label for="dateOfBirth">Date of birth</label>
+            <input id="dateOfBirth" type="date" th:field="*{dateOfBirth}" required/>
+        </div>
+
+
+        <div>
+            <label for="email">Email</label>
+            <input id="email" type="email" th:field="*{email}" required/>
+        </div>
+
+        <div>
+            <label for="nif">NIF</label>
+            <input id="nif" type="text" th:field="*{nif}" required/>
+        </div>
+
+        <div>
+            <label for="telephoneNumber">Telephone Number</label>
+            <input id="telephoneNumber" type="tel" th:field="*{telephoneNumber}" required/>
+        </div>
+
+        <div>
+            <label for="postcode">Postcode</label>
+            <input id="postcode" type="number" th:field="*{postcode}" required/>
+        </div>
+
+        <div>
+            <label for="city">City</label>
+            <input id="city" type="text" th:field="*{city}" required/>
+        </div>
+
+        <div>
+            <label for="streetName">Street Name</label>
+            <input id="streetName" type="text" th:field="*{streetName}" required/>
+        </div>
+
+        <div>
+            <label for="streetNumber">Street Number</label>
+            <input id="streetNumber" type="number" th:field="*{streetNumber}" required/>
+        </div>
+
+        <div>
+            <label for="password">Password</label>
+            <input id="password" type="password" th:field="*{password}" required/>
+        </div>
+
+        <div>
+            <button type="submit">Create account</button>
+        </div>
+    </form>
+
+    <p>Already have an account? <a th:href="@{/users/patients}">Login</a></p>
+</main>
+
+</body>
+</html>

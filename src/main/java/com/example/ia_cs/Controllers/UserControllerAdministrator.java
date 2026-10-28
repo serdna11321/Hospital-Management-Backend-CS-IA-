@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/user/administrators")
+@RequestMapping("/users/administrators")
 public class UserControllerAdministrator {
 
     private final UserService userService;
@@ -23,18 +23,18 @@ public class UserControllerAdministrator {
     public String showAdministratorUser(Model model){
         model.addAttribute("createDoctor", new CreateDoctorRequestDTO());
         model.addAttribute("createAdmin", new CreateAdministratorRequestDTO());
-        return "user/administrators/index";
+        return "users/administrators/index";
     }
 
     @PostMapping("/createDoctor")
     public String createDoctorAccount(@ModelAttribute("/createDoctor") CreateDoctorRequestDTO request){
         userService.createDoctorAccount(request);
-        return "redirect:/user/administrators";
+        return "redirect:/users/administrators";
     }
 
     @PostMapping("/createAdmin")
     public String createAdministratorAccount(@ModelAttribute("/createAdmin") CreateAdministratorRequestDTO request){
         userService.createAdministratorAccount(request);
-        return "redirect:/user/administrators";
+        return "redirect:/users/administrators";
     }
 }

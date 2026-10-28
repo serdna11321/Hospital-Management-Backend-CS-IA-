@@ -5,10 +5,7 @@ import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateApp
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.ChangeAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.PeriodicUpdateDTOs.RescheduledAppointmentDTO;
 import com.example.ia_cs.entities.*;
-import com.example.ia_cs.repositories.AppointmentRepository;
-import com.example.ia_cs.repositories.DoctorRepository;
-import com.example.ia_cs.repositories.PatientRepository;
-import com.example.ia_cs.repositories.VacationRequestRepository;
+import com.example.ia_cs.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,7 +21,7 @@ public class AppointmentService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final List<RescheduledAppointmentDTO> rescheduledAppointmentsDTOs = new ArrayList<>();
-    private final MedicalRecordService medicalRecordService;
+    private final UserRepository userRepository;
 
 
     public void addToRescheduledAppointmentsList(RescheduledAppointmentDTO rescheduledAppointmentDTO){
@@ -35,17 +32,17 @@ public class AppointmentService {
         rescheduledAppointmentsDTOs.remove(rescheduledAppointmentDTO);
     }
 
-    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, MedicalRecordService medicalRecordService){
+    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository,  UserRepository userRepository){
         this.appointmentRepository=appointmentRepository;
         this.vacationRequestRepository = vacationRequestRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
-        this.medicalRecordService = medicalRecordService;
+        this.userRepository = userRepository;
     }
 
     public void requestAppointment(CreateAppointmentRequestDTO request, long userID){
         Doctor doctor = getDoctorFromID(request.getDoctorID());
-        Patient patient = patientRepository.findByUserID(userID);
+        Patient patient = patientRepository.findByPersonPersonID(userRepository.findByUserID(userID).get().getPerson().getPersonID()).get();
         LocalDate date = request.getDate();
         LocalTime time = request.getTime();
         boolean occupied = isTimeSlotOccupied(doctor, patient, date, time);

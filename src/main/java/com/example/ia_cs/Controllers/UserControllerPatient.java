@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 
 
 @Controller
-@RequestMapping("/user/patient")
+@RequestMapping("/users/patients")
 public class UserControllerPatient {
 
     private final UserService userService;
@@ -21,13 +21,13 @@ public class UserControllerPatient {
     @GetMapping
     public String showPatientDashboard(Model model){
         model.addAttribute("createPatient", new CreatePatientRequestDTO());
-        return "user/patient/index";
+        return "users/patients/index";
     }
 
     @PostMapping("/createPatient")
-    public String createPatientAccount(@ModelAttribute("/createPatient") CreatePatientRequestDTO request){
+    public String createPatientAccount(@ModelAttribute("createPatient") CreatePatientRequestDTO request){
         userService.createPatientAccount(request);
-        return "redirect:/user/patient";
+        return "redirect:/users/patients";
     }
 
 }

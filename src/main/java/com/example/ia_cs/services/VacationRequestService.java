@@ -38,7 +38,7 @@ public class VacationRequestService {
     }
 
     public VacationRequest requestVacation(CreateVacationRequestDTO request, long userID){
-        Optional<Doctor> optionalDoctor = doctorRepository.findByUserID(userID);
+        Optional<Doctor> optionalDoctor = doctorRepository.findByPersonPersonID(userRepository.findByUserID(userID).get().getPerson().getPersonID());
         if (optionalDoctor.isEmpty()) throw new RuntimeException("Doctor does not exist");
         Doctor doctor = optionalDoctor.get();
         LocalDate startDate = request.getStartDate();

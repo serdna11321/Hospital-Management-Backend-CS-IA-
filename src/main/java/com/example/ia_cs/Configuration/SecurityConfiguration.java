@@ -38,12 +38,13 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         authorizeRequest -> authorizeRequest
-                                .requestMatchers("/api/appointments").hasRole("PATIENT")
-                                .requestMatchers("/api/users/patients").permitAll()
-                                .requestMatchers("/api/users/administrators").hasRole("ADMINISTRATOR")
-                                .requestMatchers("/api/vacationRequests/doctors").hasRole("DOCTOR")
-                                .requestMatchers("/api/vacationRequests/administrators").hasRole("ADMINISTRATOR")
-                                .requestMatchers("/api/authentication").permitAll()
+                                .requestMatchers("/appointments/**").hasRole("PATIENT")
+                                .requestMatchers("/users/patients/**").permitAll()
+                                .requestMatchers("/users/administrators/**").hasRole("ADMINISTRATOR")
+                                .requestMatchers("/vacationRequests/doctors/**").hasRole("DOCTOR")
+                                .requestMatchers("/vacationRequests/administrators/**").hasRole("ADMINISTRATOR")
+                                .requestMatchers("/authentication/**").permitAll()
+                                .requestMatchers("/**", "/error/**").permitAll()
                                 .anyRequest().authenticated()
                 ).oauth2ResourceServer(oauth2 ->
                          oauth2.jwt(jwt ->

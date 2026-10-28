@@ -19,4 +19,5 @@ public class CreatePatientRequestDTO {
     private LocalDate dateOfBirth;
     private String telephoneNumber;
     private String postcode;
+    private String password;
 }

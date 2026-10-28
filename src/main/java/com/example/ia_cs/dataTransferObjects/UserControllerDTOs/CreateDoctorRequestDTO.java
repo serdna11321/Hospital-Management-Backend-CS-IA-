@@ -20,4 +20,5 @@ public class CreateDoctorRequestDTO {
     private String telephoneNumber;
     private String postcode;
     private String specialty;
+    private String password;
 }

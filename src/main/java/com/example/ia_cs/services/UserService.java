@@ -33,16 +33,16 @@ public class UserService {
         Optional<Person> optionalPerson = personRepository.findByNif(request.getNif());
         if (optionalPerson.isEmpty()){
             person = createNewPerson(request.getNif());
-            createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByRoleName(RoleName.PATIENT), person);
+            createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByName(RoleName.PATIENT), person);
         }
         else{
             person = personRepository.findByNif(request.getNif()).get();
-            if (patientRepository.findByPersonID(person.getPersonID()).isPresent()){
+            if (patientRepository.findByPersonPersonID(person.getPersonID()).isPresent()){
                 throw new RuntimeException("Patient Account Already Exists");
             }
             else{
                 User user = userRepository.findByPerson(person).get();
-                user.getRoles().add(roleRepository.findByRoleName(RoleName.PATIENT));
+                user.getRoles().add(roleRepository.findByName(RoleName.PATIENT));
                 userRepository.save(user);
             }
         }
@@ -59,16 +59,16 @@ public class UserService {
         Optional<Person> optionalPerson = personRepository.findByNif(request.getNif());
         if (optionalPerson.isEmpty()){
             person = createNewPerson(request.getNif());
-            createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByRoleName(RoleName.DOCTOR), person);
+            createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByName(RoleName.DOCTOR), person);
         }
         else{
             person = personRepository.findByNif(request.getNif()).get();
-            if (doctorRepository.findByPersonID(person.getPersonID()).isPresent()){
+            if (doctorRepository.findByPersonPersonID(person.getPersonID()).isPresent()){
                 throw new RuntimeException("Doctor Account Already Exists");
             }
             else{
                 User user = userRepository.findByPerson(person).get();
-                user.getRoles().add(roleRepository.findByRoleName(RoleName.DOCTOR));
+                user.getRoles().add(roleRepository.findByName(RoleName.DOCTOR));
                 userRepository.save(user);
             }
         }
@@ -85,16 +85,16 @@ public class UserService {
         Optional<Person> optionalPerson = personRepository.findByNif(request.getNif());
         if (optionalPerson.isEmpty()){
             person = createNewPerson(request.getNif());
-            createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByRoleName(RoleName.ADMINISTRATOR), person);
+            createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByName(RoleName.ADMINISTRATOR), person);
         }
         else{
             person = personRepository.findByNif(request.getNif()).get();
-            if (administratorRepository.existsWithPersonID(person.getPersonID())){
+            if (administratorRepository.findByPersonPersonID(person.getPersonID()).isPresent()){
                 throw new RuntimeException("Admin Account Already Exists");
             }
             else{
                 User user = userRepository.findByPerson(person).get();
-                user.getRoles().add(roleRepository.findByRoleName(RoleName.ADMINISTRATOR));
+                user.getRoles().add(roleRepository.findByName(RoleName.ADMINISTRATOR));
                 userRepository.save(user);
             }
         }

@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 @Configuration
 public class JwtConfiguration {
 
-    @Value("${jwt_secret}")
+    @Value("${jwt_secret:my_super_secret_jwt_key_for_hospital_management_system_2026!}")
     private String secret;
 
     @Bean

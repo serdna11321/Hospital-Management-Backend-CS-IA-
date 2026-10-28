@@ -3,7 +3,6 @@ package com.example.ia_cs.Controllers;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CancelAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.ChangeAppointmentRequestDTO;
-import com.example.ia_cs.entities.Appointment;
 import com.example.ia_cs.repositories.DoctorRepository;
 import com.example.ia_cs.services.AppointmentService;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -38,7 +37,7 @@ public class AppointmentController {
         model.addAttribute("changeRequest", new ChangeAppointmentRequestDTO());
         model.addAttribute("cancelRequest", new CancelAppointmentRequestDTO());
 
-        model.addAttribute("doctors", doctorRepository.getAllDoctors());
+        model.addAttribute("doctors", doctorRepository.findAll());
 
         if (selectedDoctorId != null) {
             model.addAttribute("selectedDoctorId", selectedDoctorId);

@@ -38,12 +38,12 @@ public class VacationRequestService {
     }
 
     public VacationRequest requestVacation(CreateVacationRequestDTO request, long userID){
-        Optional<Doctor> optionalDoctor = doctorRepository.getByUserID(userID);
+        Optional<Doctor> optionalDoctor = doctorRepository.findByUserID(userID);
         if (optionalDoctor.isEmpty()) throw new RuntimeException("Doctor does not exist");
         Doctor doctor = optionalDoctor.get();
         LocalDate startDate = request.getStartDate();
         LocalDate endDate = request.getEndDate();
-        if (vacationRequestRepository.existsVacationRequestBetweenDatesAndNotStatusAndDoctor(doctor, startDate, endDate, VacationRequestStatus.DENIED)){
+        if (existsVacationRequestBetweenDatesAndNotStatusAndDoctor(VacationRequestStatus.DENIED, doctor, startDate, endDate)){
             throw new RuntimeException("There is already an approved or pending vacation request within these dates");
         }
         VacationRequest vacationRequest = new VacationRequest();
@@ -105,5 +105,18 @@ public class VacationRequestService {
         for (Appointment appointment : affectedAppointments){
             appointment.setAffectingVacationRequest(null);
         }
+    }
+
+    private boolean existsVacationRequestBetweenDatesAndNotStatusAndDoctor(VacationRequestStatus status, Doctor doctor, LocalDate startDate, LocalDate endDate){
+        for (VacationRequest vacationRequest : vacationRequestRepository.findAll()){
+            if (vacationRequest.getDoctor() == doctor) {
+                if (vacationRequest.getStartDate().isAfter(startDate) && vacationRequest.getStartDate().isBefore(endDate) || vacationRequest.getStartDate().isBefore(startDate) && vacationRequest.getEndDate().isAfter(startDate)){
+                    if (vacationRequest.getStatus()!=status){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

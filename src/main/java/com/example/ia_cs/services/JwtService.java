@@ -33,7 +33,7 @@ public class JwtService {
 
         return Jwts.builder()
                 .subject(authentication.getName())
-                .claim("userID", userRepository.getUserIdFromEmail(authentication.getName()))
+                .claim("userID", userRepository.findUserIdFromUserEmail(authentication.getName()))
                 .claim("roles", roles)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 3600000))

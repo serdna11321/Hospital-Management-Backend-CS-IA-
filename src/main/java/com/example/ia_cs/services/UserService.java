@@ -1,7 +1,5 @@
 package com.example.ia_cs.services;
 
-import com.example.ia_cs.dataTransferObjects.AuthControllerDTOs.LoginRequestDTO;
-import com.example.ia_cs.dataTransferObjects.AuthControllerDTOs.LoginResponseDTO;
 import com.example.ia_cs.dataTransferObjects.UserControllerDTOs.*;
 import com.example.ia_cs.entities.*;
 import com.example.ia_cs.repositories.*;
@@ -39,7 +37,7 @@ public class UserService {
         }
         else{
             person = personRepository.findByNif(request.getNif()).get();
-            if (patientRepository.existsWithPersonID(person.getPersonID())){
+            if (patientRepository.findByPersonID(person.getPersonID()).isPresent()){
                 throw new RuntimeException("Patient Account Already Exists");
             }
             else{
@@ -65,7 +63,7 @@ public class UserService {
         }
         else{
             person = personRepository.findByNif(request.getNif()).get();
-            if (doctorRepository.existsWithPersonID(person.getPersonID())){
+            if (doctorRepository.findByPersonID(person.getPersonID()).isPresent()){
                 throw new RuntimeException("Doctor Account Already Exists");
             }
             else{
@@ -138,13 +136,9 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return userRepository.findByUserEmail(email)
                 .orElseThrow(() ->
                         new RuntimeException("User not found"));
-    }
-
-    public String getPasswordHashByEmail(String email) {
-        return userRepository.getPasswordHash(email);
     }
 
     private Patient createPatient(CreatePatientRequestDTO request, Person person) {

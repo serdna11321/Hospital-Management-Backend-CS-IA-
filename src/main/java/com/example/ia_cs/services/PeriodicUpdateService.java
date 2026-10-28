@@ -40,7 +40,7 @@ public class PeriodicUpdateService {
 
     @Scheduled(fixedRate = UPDATE_RATE)
     public void periodicUpdate(){
-        for (User user : userRepository.getAll()){
+        for (User user : userRepository.findAll()){
             int userID = Math.toIntExact(user.getUserID());
             if (connectionService.isConnected((Math.toIntExact(user.getUserID())))){
                 updateSenderService.sendUpdate(userID, createUpdateforUser(user));
@@ -52,12 +52,12 @@ public class PeriodicUpdateService {
         UpdateDTO updateDTO = new UpdateDTO();
         if (user.getRoles().contains(roleRepository.findByRoleName(RoleName.PATIENT))){
             updateDTO.setDoctorAvailability(prepareDoctorOccupiedDTO());
-            updateDTO.setPatientAppointments(preparePatientAppointments(patientRepository.getByUserID(user.getUserID())));
-            updateDTO.setRescheduledAppointments(appointmentService.getAndRemoveRescheduledAppointments(patientRepository.getPatientIDByUser(user)));
+            updateDTO.setPatientAppointments(preparePatientAppointments(patientRepository.findByUserID(user.getUserID())));
+            updateDTO.setRescheduledAppointments(appointmentService.getAndRemoveRescheduledAppointments(patientRepository.findPatientIDByUser(user)));
         }
         if (user.getRoles().contains(roleRepository.findByRoleName(RoleName.DOCTOR))){
-            updateDTO.setDoctorAppointments(prepareDoctorAppointments(doctorRepository.getByUserID(user.getUserID()).get()));
-            updateDTO.setDoctorVacationRequests(prepareDoctorVacationRequests(doctorRepository.getByUserID(user.getUserID()).get()));
+            updateDTO.setDoctorAppointments(prepareDoctorAppointments(doctorRepository.findByUserID(user.getUserID()).get()));
+            updateDTO.setDoctorVacationRequests(prepareDoctorVacationRequests(doctorRepository.findByUserID(user.getUserID()).get()));
         }
         if (user.getRoles().contains(roleRepository.findByRoleName(RoleName.ADMINISTRATOR))){
             updateDTO.setAdministratorVacationRequests(prepareAdministratorVacationRequests());
@@ -121,7 +121,7 @@ public class PeriodicUpdateService {
 
     private List<VacationRequestDTO> prepareAdministratorVacationRequests(){
         List<VacationRequestDTO> vacationRequestDTOs = new ArrayList<>();
-        for (VacationRequest vacationRequest : vacationRequestRepository.getAll()){
+        for (VacationRequest vacationRequest : vacationRequestRepository.findAll()){
             VacationRequestDTO vacationRequestDTO = new VacationRequestDTO();
             vacationRequestDTO.setDoctorName(vacationRequest.getDoctor().getFirstName());
             vacationRequestDTO.setVacationRequestID(vacationRequest.getVacationRequestID());

@@ -45,7 +45,7 @@ public class AppointmentService {
 
     public void requestAppointment(CreateAppointmentRequestDTO request, long userID){
         Doctor doctor = getDoctorFromID(request.getDoctorID());
-        Patient patient = patientRepository.getByUserID(userID);
+        Patient patient = patientRepository.findByUserID(userID);
         LocalDate date = request.getDate();
         LocalTime time = request.getTime();
         boolean occupied = isTimeSlotOccupied(doctor, patient, date, time);
@@ -64,7 +64,7 @@ public class AppointmentService {
     }
 
     public void cancelAppointment(CancelAppointmentRequestDTO request){
-        Optional<Appointment> optionalAppointment = appointmentRepository.getAppointmentByAppointmentID(request.getAppointmentID());
+        Optional<Appointment> optionalAppointment = appointmentRepository.findByAppointmentID(request.getAppointmentID());
         if (optionalAppointment.isEmpty()){
             throw new RuntimeException("Appointment does not exist");
         }
@@ -81,7 +81,7 @@ public class AppointmentService {
     }
 
     public List<LocalDateTime> getAvailableSlots(LocalDate date, Long doctorId) {
-        List<LocalDateTime> occupiedSlots = getOccupiedDateTimesFromDate(doctorRepository.getByDoctorID(doctorId).get(), date);
+        List<LocalDateTime> occupiedSlots = getOccupiedDateTimesFromDate(doctorRepository.findByDoctorID(doctorId).get(), date);
         Set<LocalDateTime> occupiedSet = new HashSet<>(occupiedSlots);
 
         List<LocalDateTime> availableSlots = new ArrayList<>();
@@ -111,7 +111,7 @@ public class AppointmentService {
     }
 
     public void changeAppointmentDateTime(ChangeAppointmentRequestDTO request){
-        Optional<Appointment> optionalAppointment = appointmentRepository.getAppointmentByAppointmentID(request.getAppointmentID());
+        Optional<Appointment> optionalAppointment = appointmentRepository.findByAppointmentID(request.getAppointmentID());
         if (optionalAppointment.isEmpty()){
             throw new RuntimeException("Appointment does not exist");
         }
@@ -129,7 +129,7 @@ public class AppointmentService {
     }
 
     public Doctor getDoctorFromID(long doctorID){
-        Optional<Doctor> doctor = doctorRepository.getByDoctorID(doctorID);
+        Optional<Doctor> doctor = doctorRepository.findByDoctorID(doctorID);
         if (doctor.isPresent()){
             return doctor.get();
         }
@@ -139,11 +139,31 @@ public class AppointmentService {
     }
 
     public boolean isTimeSlotOccupied(Doctor doctor, Patient patient, LocalDate date, LocalTime time){
-        return !((appointmentRepository.existsByDoctorAndDateAtTimeAndStatus(doctor, date, time, AppointmentStatus.BOOKED)) || (appointmentRepository.existsByPatientAndDateAtTimeAndStatus(patient, date, time, AppointmentStatus.BOOKED)) || (vacationRequestRepository.existsVacationRequestAtDateWithStatus(date, VacationRequestStatus.APPROVED)));
+        return !((appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatus(doctor, date, time, AppointmentStatus.BOOKED)) || (appointmentRepository.existsByPatientAndAppointmentDateAndAppointmentTimeAndStatus(patient, date, time, AppointmentStatus.BOOKED)) || (vacationRequestRepository.existsVacationRequestByDateAndStatus(date, VacationRequestStatus.APPROVED)));
     }
 
     public LocalDateTime findNextAvailableDateTime(Doctor doctor){
-        return appointmentRepository.findNextAvailableDateTimeFromDateForDoctor(LocalDate.now(), doctor);
+        List<LocalDateTime> occupiedSlots = getOccupiedDateTimesFromDate(doctorRepository.findByDoctorID(doctor.getDoctorID()).get(), LocalDate.now());
+        Set<LocalDateTime> occupiedSet = new HashSet<>(occupiedSlots);
+
+        LocalDate currentDate = LocalDate.now();
+        LocalTime workStart = LocalTime.of(9, 0);   // 9:00 AM
+        LocalTime workEnd = LocalTime.of(17, 0);   // 5:00 PM
+        int slotDurationMinutes = 30;
+        while (true){
+            LocalDateTime currentSlot = currentDate.atTime(workStart);
+            LocalDateTime endOfDay = currentDate.atTime(workEnd);
+
+            while (currentSlot.isBefore(endOfDay)) {
+                if (!occupiedSet.contains(currentSlot)) {
+                    return currentSlot;
+                }
+
+                currentSlot = currentSlot.plusMinutes(slotDurationMinutes);
+            }
+            currentDate=currentDate.plusDays(1);
+
+        }
     }
 
     public List<RescheduledAppointmentDTO> getAndRemoveRescheduledAppointments(Long patientID) {

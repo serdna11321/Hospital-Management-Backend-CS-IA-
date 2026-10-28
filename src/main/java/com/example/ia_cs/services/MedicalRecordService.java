@@ -21,7 +21,7 @@ public class MedicalRecordService {
     }
 
     public MedicalRecord addMedicalRecord(CreateMedicalRecordDTO createMedicalRecordDTO){
-        Optional<Patient> optionalPatient = patientRepository.getByPatientID(createMedicalRecordDTO.getPatientID());
+        Optional<Patient> optionalPatient = patientRepository.findByPatientID(createMedicalRecordDTO.getPatientID());
         if (optionalPatient.isEmpty()){
             throw new RuntimeException("Patient not found");
         }

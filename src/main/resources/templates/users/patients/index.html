@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
 </head>
 <body>
+<div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main>
+
     <h1>Create Patient Account</h1>
 
     <form th:action="@{/users/patients/createPatient}" th:object="${createPatient}" method="post">

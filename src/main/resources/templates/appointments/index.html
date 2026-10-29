@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout :: head(Appointments)}"></head>
+
+<body>
+    <div th:replace="~{fragments/layout :: navbar}"></div>
+
+    <main>
+        <div sec:authorize="hasRole('PATIENT')">
+        <h1>Your Appointments</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Doctor</th>
+                <th>Status</th>
+                <th>Update Appointment</th>
+                <th>Cancel Appointment</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="appointment : ${appointments}">
+                    <td th:text="appointment.appointmentDate"></td>
+                    <td th:text="appointment.appointmentTime"></td>
+                    <td th:text="appointment.doctor"></td>
+                    <td th:text="appointment.status"></td>
+                    <td>
+                        <form th:action="@{appointments/update}" method="post">
+                            <input type="hidden" th:value="${appointmentID}"/>
+                            <label for="UpdateDate">New Date</label>
+                            <input type="date" id="UpdateDate" th:field="*{date}" required/>
+                            <label for="UpdateTime">New Time</label>
+                            <input type="time" id="UpdateTime" th:field="*{time}" required/>
+                            <button type="submit">Submit Request</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form>
+                            <input type="hidden" th:value="${appointmentID}"/>
+                            <button type="submit">Cancel Appointment</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h1>Request New Appointment</h1>
+            <form th:action="@{/appointments/create}" th:object="${createRequest}" method="post">
+
+                <div>
+                    <label for="doctorId">Doctor:</label>
+                    <select id="doctorId" th:field="*{doctorId}"
+                            onchange="if(this.value) window.location.href='/appointments?selectedDoctorId=' + this.value;" required>
+                        <option value="">-- Select a Doctor --</option>
+                        <option th:each="doc : ${doctors}"
+                                th:value="${doc.id}"
+                                th:selected="${doc.id == selectedDoctorId}"
+                                th:text="${'Dr. ' + doc.firstName + ' ' + doc.lastName}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="appointmentDateTime">Available Date & Time:</label>
+                    <select id="appointmentDateTime" th:field="*{appointmentDateTime}" required>
+                        <option value="">-- Select Date & Time --</option>
+
+                        <option th:each="slot : ${availableSlots}"
+                                th:value="${slot}"
+                                th:text="${#temporals.format(slot, 'EEEE, MMM d, yyyy - HH:mm')}">
+                            Monday, Oct 26, 2026 - 09:00
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit">Book Appointment</button>
+            </form>
+        </div>
+
+        <div sec:authorize="hasRole('DOCTOR')">
+            <h1>Your Appointments</h1>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Patient</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="appointment : ${appointments}">
+                    <td th:text="appointment.appointmentDate"></td>
+                    <td th:text="appointment.appointmentTime"></td>
+                    <td th:text="appointment.patient"></td>
+                    <td th:text="appointment.status"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

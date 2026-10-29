@@ -23,9 +23,6 @@ public class JwtService {
 
     public String createToken(Authentication authentication) {
 
-        CustomUserDetailsService userDetailsService =
-                (CustomUserDetailsService) authentication.getPrincipal();
-
         List<String> roles = authentication.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)

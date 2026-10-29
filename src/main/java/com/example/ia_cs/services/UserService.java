@@ -4,6 +4,7 @@ import com.example.ia_cs.dataTransferObjects.UserControllerDTOs.*;
 import com.example.ia_cs.entities.*;
 import com.example.ia_cs.repositories.*;
 import jakarta.transaction.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,18 +18,20 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final DoctorRepository doctorRepository;
     private final AdministratorRepository administratorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PersonRepository personRepository, PatientRepository patientRepository, RoleRepository roleRepository, DoctorRepository doctorRepository, AdministratorRepository administratorRepository) {
+    public UserService(UserRepository userRepository, PersonRepository personRepository, PatientRepository patientRepository, RoleRepository roleRepository, DoctorRepository doctorRepository, AdministratorRepository administratorRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.personRepository = personRepository;
         this.patientRepository = patientRepository;
         this.roleRepository = roleRepository;
         this.doctorRepository = doctorRepository;
         this.administratorRepository = administratorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
-    public PatientDTO createPatientAccount(CreatePatientRequestDTO request){
+    public void createPatientAccount(CreatePatientRequestDTO request){
         Person person;
         Optional<Person> optionalPerson = personRepository.findByNif(request.getNif());
         if (optionalPerson.isEmpty()){
@@ -36,11 +39,12 @@ public class UserService {
             createNewUser(request.getEmail(), request.getPasswordHash(), roleRepository.findByName(RoleName.PATIENT), person);
         }
         else{
-            person = personRepository.findByNif(request.getNif()).get();
+            person = optionalPerson.get();
             if (patientRepository.findByPersonPersonID(person.getPersonID()).isPresent()){
                 throw new RuntimeException("Patient Account Already Exists");
             }
             else{
+
                 User user = userRepository.findByPerson(person).get();
                 user.getRoles().add(roleRepository.findByName(RoleName.PATIENT));
                 userRepository.save(user);
@@ -48,13 +52,11 @@ public class UserService {
         }
 
         Patient patient = createPatient(request, person);
-        PatientDTO patientDTO = createPatientDTO(patient);
         patientRepository.save(patient);
-        return patientDTO;
     }
 
     @Transactional
-    public DoctorDTO createDoctorAccount(CreateDoctorRequestDTO request){
+    public void createDoctorAccount(CreateDoctorRequestDTO request){
         Person person;
         Optional<Person> optionalPerson = personRepository.findByNif(request.getNif());
         if (optionalPerson.isEmpty()){
@@ -74,13 +76,11 @@ public class UserService {
         }
 
         Doctor doctor = createDoctor(request, person);
-        DoctorDTO doctorDTO = createDoctorDTO(doctor);
         doctorRepository.save(doctor);
-        return doctorDTO;
     }
 
     @Transactional
-    public AdministratorDTO createAdministratorAccount(CreateAdministratorRequestDTO request){
+    public void createAdministratorAccount(CreateAdministratorRequestDTO request){
         Person person;
         Optional<Person> optionalPerson = personRepository.findByNif(request.getNif());
         if (optionalPerson.isEmpty()){
@@ -100,9 +100,7 @@ public class UserService {
         }
 
         Administrator administrator = createAdministrator(request, person);
-        AdministratorDTO administratorDTO = createAdministratorDTO(administrator);
         administratorRepository.save(administrator);
-        return administratorDTO;
     }
 
     private Administrator createAdministrator(CreateAdministratorRequestDTO request, Person person) {
@@ -126,9 +124,10 @@ public class UserService {
         return person;
     }
 
-    public void createNewUser(String email, String passwordHash, Role userRole, Person person){
+    public void createNewUser(String email, String password, Role userRole, Person person){
         User user = new User();
         user.setUserEmail(email);
+        String passwordHash = passwordEncoder.encode(password);
         user.setPasswordHash(passwordHash);
         user.getRoles().add(userRole);
         user.setPerson(person);
@@ -168,48 +167,5 @@ public class UserService {
         doctor.setPostcode(request.getPostcode());
         doctor.setSpecialty(request.getSpecialty());
         return doctor;
-    }
-
-    private PatientDTO createPatientDTO(Patient patient){
-        PatientDTO patientDTO = new PatientDTO();
-        patientDTO.setCity(patient.getCity());
-        patientDTO.setDateOfBirth(patient.getDateOfBirth());
-        patientDTO.setFirstName(patient.getFirstName());
-        patientDTO.setLastName(patient.getLastName());
-        patientDTO.setPatientID(patient.getPatientID());
-        patientDTO.setPostcode(patient.getPostcode());
-        patientDTO.setStreetName(patient.getStreetName());
-        patientDTO.setStreetNumber(patient.getStreetNumber());
-        patientDTO.setTelephoneNumber(patient.getTelephoneNumber());
-        return patientDTO;
-    }
-
-    private DoctorDTO createDoctorDTO(Doctor doctor){
-        DoctorDTO doctorDTO = new DoctorDTO();
-        doctorDTO.setCity(doctor.getCity());
-        doctorDTO.setDateOfBirth(doctor.getDateOfBirth());
-        doctorDTO.setFirstName(doctor.getFirstName());
-        doctorDTO.setLastName(doctor.getLastName());
-        doctorDTO.setDoctorID(doctor.getDoctorID());
-        doctorDTO.setPostcode(doctor.getPostcode());
-        doctorDTO.setStreetName(doctor.getStreetName());
-        doctorDTO.setStreetNumber(doctor.getStreetNumber());
-        doctorDTO.setTelephoneNumber(doctor.getTelephoneNumber());
-        doctorDTO.setSpecialty(doctorDTO.getSpecialty());
-        return doctorDTO;
-    }
-
-    private AdministratorDTO createAdministratorDTO(Administrator administrator){
-        AdministratorDTO administratorDTO = new AdministratorDTO();
-        administratorDTO.setCity(administrator.getCity());
-        administratorDTO.setDateOfBirth(administrator.getDateOfBirth());
-        administratorDTO.setFirstName(administrator.getFirstName());
-        administratorDTO.setLastName(administrator.getLastName());
-        administratorDTO.setAdministratorID(administrator.getAdministratorID());
-        administratorDTO.setPostcode(administrator.getPostcode());
-        administratorDTO.setStreetName(administrator.getStreetName());
-        administratorDTO.setStreetNumber(administrator.getStreetNumber());
-        administratorDTO.setTelephoneNumber(administrator.getTelephoneNumber());
-        return administratorDTO;
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/authentication")
+@RequestMapping("/auth")
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -27,7 +27,7 @@ public class AuthenticationController {
     @GetMapping
     public String showAuthenticationPage(Model model) {
         model.addAttribute("login", new LoginRequestDTO());
-        return "auth/login";
+        return "auth/index";
     }
 
     @PostMapping
@@ -48,11 +48,13 @@ public class AuthenticationController {
 
             response.addCookie(jwtCookie);
 
-            return "redirect:/dashboard";
+            return "redirect:/appointments";
 
         } catch (AuthenticationException e) {
-            model.addAttribute("error", "Invalid credentials. Please try again.");
-            return "auth/login"; // Re-render login view with error context
+            System.out.println("Authentication failed type: " + e.getClass().getName());
+            System.out.println("Message: " + e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            return "auth/index";
         }
     }
 }

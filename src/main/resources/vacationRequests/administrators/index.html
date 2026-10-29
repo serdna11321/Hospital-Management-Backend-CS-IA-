@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(Administrator - Vacation Requests)}"></head>
+<body sec:authorize="hasRole('ADMIN')">
+
+<div th:replace="~fragments/layout :: navbar}"></div>
+
+<main>
+    <h1>Vacation Requests</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Doctor Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="request : ${pendingRequests}">
+                <td th:text="${requestID}"></td>
+                <td th:text="$request.doctorName"></td>
+                <td th:text="$request.startDate"></td>
+                <td th:text="$request.endDate"></td>
+                <td>
+                    <form th:action="@{vacationRequests/administrators/approve}" method="post" style="display:inline;">
+                        <input type="hidden" name="requestID" th:value="${requestID}"/>
+                        <button type="submit">Approve</button>
+                    </form>
+
+                    <form th:action="@{vacationrequests/administrators/approve}" method="post" style="display:inline;">
+                        <input type="hidden" name="requestID" th:value="${requestID}"/>
+                        <button type="submit">Deny</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="{#lists.isEmpty(pendingRequests)}">
+                <td colspan="4">No Vacation Requests Found</td>
+            </tr>
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

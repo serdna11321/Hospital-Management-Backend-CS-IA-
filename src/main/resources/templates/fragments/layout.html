@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">Hospital Management</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+</head>
+<body>
+
+<!-- Shared Navigation Bar -->
+<nav th:fragment="navbar" class="navbar">
+    <a th:href="@{/dashboard}">Dashboard</a> |
+    <a th:href="@{/appointments}">Appointments</a> |
+    <a th:href="@{/vacationRequests/doctors}">Doctor Vacations</a> |
+    <a th:href="@{/vacationRequests/administrators}">Admin Vacations</a> |
+    <a th:href="@{/auth}">Logout</a>
+</nav>
+
+</body>
+</html>

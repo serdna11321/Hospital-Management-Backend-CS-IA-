@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
 </head>
 <body>
-<div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main>
     <h1>Create Patient Account</h1>
@@ -63,7 +62,7 @@
 
         <div>
             <label for="password">Password</label>
-            <input id="password" type="password" th:field="*{password}" required/>
+            <input id="password" type="password" th:field="*{passwordHash}" required/>
         </div>
 
         <div>
@@ -71,7 +70,7 @@
         </div>
     </form>
 
-    <p>Already have an account? <a th:href="@{/users/patients}">Login</a></p>
+    <p>Already have an account? <a th:href="@{/auth}">Login</a></p>
 </main>
 
 </body>

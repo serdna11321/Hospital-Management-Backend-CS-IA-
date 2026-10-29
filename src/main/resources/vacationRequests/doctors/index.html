@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Doctor - Request Vacation')}"></head>
+<body sec:authorize="hasRole('DOCTOR')">
+
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+<main>
+    <h1>Submit Vacation Request</h1>
+
+    <!-- Form bound to CreateVacationRequestDTO -->
+    <form th:action="@{/vacationRequests/doctors}" th:object="${requestVacation}" method="post">
+        <div>
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate" th:field="*{startDate}" required />
+        </div>
+
+        <div>
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate" th:field="*{endDate}" required />
+        </div>
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+    <h2>Your Vacation History</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="request : ${vacationHistory}">
+            <td th:text="${request.id}"></td>
+            <td th:text="${request.startDate}"></td>
+            <td th:text="${request.endDate}"></td>
+            <td th:text="${request.status}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(vacationHistory)}">
+            <td colspan="4">No vacation requests found.</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+
+</body>
+</html>

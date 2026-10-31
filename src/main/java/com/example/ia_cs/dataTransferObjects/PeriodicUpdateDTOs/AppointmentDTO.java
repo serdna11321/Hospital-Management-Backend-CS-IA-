@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
@@ -14,7 +15,6 @@ public class AppointmentDTO {
     private long AppointmentID;
     private String doctorName;
     private String specialty;
-    private LocalDate date;
-    private LocalTime time;
+    private LocalDateTime dateTime;
     private AppointmentStatus appointmentStatus;
 }

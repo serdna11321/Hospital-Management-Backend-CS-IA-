@@ -80,8 +80,7 @@ public class PeriodicUpdateService {
             AppointmentDTO appointmentDTO = new AppointmentDTO();
             appointmentDTO.setAppointmentID(appointment.getAppointmentID());
             appointmentDTO.setDoctorName(appointment.getDoctor().getFirstName());
-            appointmentDTO.setDate(appointment.getAppointmentDate());
-            appointmentDTO.setTime(appointment.getAppointmentTime());
+            appointmentDTO.setDateTime(appointment.getAppointmentDateTime());
             appointmentDTO.setSpecialty(appointment.getDoctor().getSpecialty());
             appointmentDTO.setAppointmentStatus(appointment.getStatus());
             appointmentDTOs.add(appointmentDTO);
@@ -94,9 +93,8 @@ public class PeriodicUpdateService {
         for (Appointment appointment : appointmentRepository.findByDoctor(doctor)){
             AppointmentDoctorDTO appointmentDoctorDTO = new AppointmentDoctorDTO();
             appointmentDoctorDTO.setAppointmentID(appointment.getAppointmentID());
-            appointmentDoctorDTO.setDate(appointment.getAppointmentDate());
+            appointmentDoctorDTO.setDateTime(appointment.getAppointmentDateTime());
             appointmentDoctorDTO.setPatientName(appointment.getPatient().getFirstName());
-            appointmentDoctorDTO.setTime(appointment.getAppointmentTime());
             appointmentDoctorDTOs.add(appointmentDoctorDTO);
         }
         return appointmentDoctorDTOs;

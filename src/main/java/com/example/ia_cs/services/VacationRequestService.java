@@ -56,7 +56,7 @@ public class VacationRequestService {
     }
 
     public void markAffectedAppointments(Doctor doctor, LocalDate startDate, LocalDate endDate, VacationRequest vacationRequest){
-        List<Appointment> affectedAppointments = appointmentRepository.findByDoctorBetweenDates(doctor, startDate, endDate);
+        List<Appointment> affectedAppointments = appointmentRepository.findByDoctorBetweenDateTimes(doctor, LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX));
         for (Appointment appointment : affectedAppointments){
             appointment.setAffectingVacationRequest(vacationRequest);
         }
@@ -84,24 +84,19 @@ public class VacationRequestService {
         for (Appointment appointment : appointmentRepository.findByAffectingVacationRequest(vacationRequest)){
             RescheduledAppointmentDTO rescheduledAppointmentDTO = new RescheduledAppointmentDTO();
             Doctor doctor = appointment.getDoctor();
-            rescheduledAppointmentDTO.setOldDate(appointment.getAppointmentDate());
-            rescheduledAppointmentDTO.setOldTime(appointment.getAppointmentTime());
+            rescheduledAppointmentDTO.setOldDateTime(appointment.getAppointmentDateTime());
             rescheduledAppointmentDTO.setDoctorName(doctor.getFirstName() + doctor.getLastName());
             rescheduledAppointmentDTO.setDoctorID(doctor.getDoctorID());
             rescheduledAppointmentDTO.setPatientID(appointment.getPatient().getPatientID());
             LocalDateTime newDateTime = appointmentService.findNextAvailableDateTime(vacationRequest.getDoctor());
-            LocalDate newDate = newDateTime.toLocalDate();
-            LocalTime newTime = newDateTime.toLocalTime();
-            appointment.setAppointmentTime(newTime);
-            appointment.setAppointmentDate(newDate);
-            rescheduledAppointmentDTO.setNewDate(newDate);
-            rescheduledAppointmentDTO.setNewTime(newTime);
+            appointment.setAppointmentDateTime(newDateTime);
+            rescheduledAppointmentDTO.setNewDateTime(newDateTime);
             appointmentService.addToRescheduledAppointmentsList((rescheduledAppointmentDTO));
         }
     }
 
     public void removeAppointmentsFromAffectedAppointments(VacationRequest vacationRequest){
-        List<Appointment> affectedAppointments = appointmentRepository.findByDoctorBetweenDates(vacationRequest.getDoctor(), vacationRequest.getStartDate(), vacationRequest.getEndDate());
+        List<Appointment> affectedAppointments = appointmentRepository.findByDoctorBetweenDateTimes(vacationRequest.getDoctor(), LocalDateTime.of(vacationRequest.getStartDate(), LocalTime.MIN), LocalDateTime.of(vacationRequest.getEndDate(), LocalTime.MAX));
         for (Appointment appointment : affectedAppointments){
             appointment.setAffectingVacationRequest(null);
         }

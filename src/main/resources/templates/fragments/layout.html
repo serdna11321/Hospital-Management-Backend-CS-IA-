@@ -10,10 +10,22 @@
 <body>
 
 <!-- Shared Navigation Bar -->
-<nav th:fragment="navbar" class="navbar">
-    <a th:href="@{/dashboard}">Dashboard</a> |
+<nav th:fragment="navbarPatient" class="navbar" style="align-items: center">
+    <ul>
+        <li><a th:href="@{/appointments}">Appointments</a></li>
+    </ul>
+    <ul>
+        <li><a th:href="@{/auth}">Logout</a></li>
+    </ul>
+</nav>
+
+<nav th:fragment="navbarDoctor" class="navbar" style="align-items: center">
     <a th:href="@{/appointments}">Appointments</a> |
-    <a th:href="@{/vacationRequests/doctors}">Doctor Vacations</a> |
+    <a th:href="@{/vacationRequests/doctors}">Vacations</a> |
+    <a th:href="@{/auth}">Logout</a>
+</nav>
+
+<nav th:fragment="navbarAdmin" class="navbar" style="align-items: center">
     <a th:href="@{/vacationRequests/administrators}">Admin Vacations</a> |
     <a th:href="@{/auth}">Logout</a>
 </nav>

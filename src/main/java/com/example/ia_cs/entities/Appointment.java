@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import com.example.ia_cs.entities.AppointmentStatus;
 
@@ -42,10 +43,7 @@ public class Appointment {
     private VacationRequest affectingVacationRequest;
 
     @Column(nullable = false)
-    private LocalTime appointmentTime;
-
-    @Column(nullable = false)
-    private LocalDate appointmentDate;
+    private LocalDateTime appointmentDateTime;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

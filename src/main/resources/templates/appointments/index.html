@@ -4,7 +4,8 @@
 <head th:replace="~{fragments/layout :: head(Appointments)}"></head>
 
 <body>
-    <div th:replace="~{fragments/layout :: navbar}"></div>
+    <div sec:authorize="hasRole('PATIENT')" th:replace="~{fragments/layout :: navbarPatient}"></div>
+    <div sec:authorize="hasRole('DOCTOR')" th:replace="~{fragments/layout :: navbarDoctor}"></div>
 
     <main>
         <div sec:authorize="hasRole('PATIENT')">
@@ -51,8 +52,8 @@
 
                 <div>
                     <label for="doctorId">Doctor:</label>
-                    <select id="doctorId" th:field="*{doctorId}"
-                            onchange="if(this.value) window.location.href='/appointments?selectedDoctorId=' + this.value;" required>
+                    <select id="doctorId" th:field="*{doctorID}"
+                            onchange="if(this.value) window.location.href='/appointments?selectedDoctorID=' + this.value;" required>
                         <option value="">-- Select a Doctor --</option>
                         <option th:each="doc : ${doctors}"
                                 th:value="${doc.id}"

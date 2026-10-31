@@ -43,9 +43,8 @@ public class AppointmentService {
     public void requestAppointment(CreateAppointmentRequestDTO request, long userID){
         Doctor doctor = getDoctorFromID(request.getDoctorID());
         Patient patient = patientRepository.findByPersonPersonID(userRepository.findByUserID(userID).get().getPerson().getPersonID()).get();
-        LocalDate date = request.getDate();
-        LocalTime time = request.getTime();
-        boolean occupied = isTimeSlotOccupied(doctor, patient, date, time);
+        LocalDateTime dateTime = request.getAppointmentDateTime();
+        boolean occupied = isTimeSlotOccupied(doctor, patient, dateTime);
         if (occupied){
             throw new RuntimeException("Either the doctor or patient are already occupied at this time.");
         }
@@ -53,8 +52,7 @@ public class AppointmentService {
         Appointment appointment = new Appointment();
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
-        appointment.setAppointmentDate(date);
-        appointment.setAppointmentTime(time);
+        appointment.setAppointmentDateTime(dateTime);
         appointment.setStatus(AppointmentStatus.BOOKED);
 
         appointmentRepository.save(appointment);
@@ -70,11 +68,14 @@ public class AppointmentService {
     }
 
     public List<LocalDateTime> getOccupiedDateTimesFromDate(Doctor doctor, LocalDate date) {
+        LocalDateTime start = date.atStartOfDay();
+        LocalDateTime end = date.plusDays(30).atStartOfDay();   // exclusive upper bound
 
-        List<Appointment> appointments =
-                appointmentRepository.findByDoctorBetweenDates(doctor, LocalDate.now(), LocalDate.now().plusDays(30));
-
-        return appointments.stream().map(appointment -> LocalDateTime.of(appointment.getAppointmentDate(), appointment.getAppointmentTime())).toList();
+        return appointmentRepository
+                .findByDoctorBetweenDateTimes(doctor, start, end)
+                .stream()
+                .map(Appointment::getAppointmentDateTime)
+                .toList();
     }
 
     public List<LocalDateTime> getAvailableSlots(LocalDate date, Long doctorId) {
@@ -113,15 +114,13 @@ public class AppointmentService {
             throw new RuntimeException("Appointment does not exist");
         }
         Appointment appointment = optionalAppointment.get();
-        LocalDate newDate = request.getNewDate();
-        LocalTime newTime = request.getNewTime();
-        boolean occupied = isTimeSlotOccupied(appointment.getDoctor(), appointment.getPatient(), newDate, newTime);
+        LocalDateTime newDateTime = request.getNewAppointmentDateTime();
+        boolean occupied = isTimeSlotOccupied(appointment.getDoctor(), appointment.getPatient(), newDateTime);
         if (occupied){
             throw new RuntimeException("Appointment cannot be changed to this time because the patient or doctor are not available.");
         }
         else{
-            appointment.setAppointmentDate(newDate);
-            appointment.setAppointmentTime(newTime);
+            appointment.setAppointmentDateTime(newDateTime);
         }
     }
 
@@ -135,8 +134,8 @@ public class AppointmentService {
         }
     }
 
-    public boolean isTimeSlotOccupied(Doctor doctor, Patient patient, LocalDate date, LocalTime time){
-        return !((appointmentRepository.existsByDoctorAndAppointmentDateAndAppointmentTimeAndStatus(doctor, date, time, AppointmentStatus.BOOKED)) || (appointmentRepository.existsByPatientAndAppointmentDateAndAppointmentTimeAndStatus(patient, date, time, AppointmentStatus.BOOKED)) || (vacationRequestRepository.existsVacationRequestByDateAndStatus(date, VacationRequestStatus.APPROVED)));
+    public boolean isTimeSlotOccupied(Doctor doctor, Patient patient, LocalDateTime dateTime){
+        return !((appointmentRepository.existsByDoctorAndAppointmentDateTimeAndStatus(doctor, dateTime, AppointmentStatus.BOOKED)) || (appointmentRepository.existsByPatientAndAppointmentDateTimeAndStatus(patient, dateTime, AppointmentStatus.BOOKED)) || (vacationRequestRepository.existsVacationRequestByDateAndStatus(LocalDate.from(dateTime), VacationRequestStatus.APPROVED)));
     }
 
     public LocalDateTime findNextAvailableDateTime(Doctor doctor){

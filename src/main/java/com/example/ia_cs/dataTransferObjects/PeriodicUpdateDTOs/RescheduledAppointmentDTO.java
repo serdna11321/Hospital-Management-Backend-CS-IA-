@@ -4,15 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
 @Setter
 public class RescheduledAppointmentDTO {
-    private LocalDate oldDate;
-    private LocalDate newDate;
-    private LocalTime oldTime;
-    private LocalTime newTime;
+    private LocalDateTime oldDateTime;
+    private LocalDateTime newDateTime;
     private String doctorName;
     private long doctorID;
     private long patientID;

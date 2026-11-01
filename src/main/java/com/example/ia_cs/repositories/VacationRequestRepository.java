@@ -25,5 +25,6 @@ public interface VacationRequestRepository extends JpaRepository<VacationRequest
     Optional<VacationRequest> findByVacationRequestID(long vacationRequestID);
     List<VacationRequest> findByDoctor(Doctor doctor);
     List<VacationRequest> findAll();
+    List<VacationRequest> findByStatus(VacationRequestStatus status);
 }
 

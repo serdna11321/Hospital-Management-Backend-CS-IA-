@@ -19,19 +19,19 @@
             </tr>
         </thead>
         <tbody>
-            <tr th:each="request : ${pendingRequests}">
-                <td th:text="${requestID}"></td>
-                <td th:text="${request.doctor.firstName + ' ' + request.doctor.lastName}"></td>
-                <td th:text="${request.startDate}"></td>
-                <td th:text="${request.endDate}"></td>
+            <tr th:each="vr : ${pendingRequests}">
+                <td th:text="${vr.vacationRequestID}"></td>
+                <td th:text="${vr.doctor.firstName + ' ' + vr.doctor.lastName}"></td>
+                <td th:text="${vr.startDate}"></td>
+                <td th:text="${vr.endDate}"></td>
                 <td>
                     <form th:action="@{/vacationRequests/administrators/approve}" method="post" style="display:inline;">
-                        <input type="hidden" name="requestID" th:value="${requestID}"/>
+                        <input type="hidden" name="vacationRequestID" th:value="${vr.vacationRequestID}"/>
                         <button type="submit">Approve</button>
                     </form>
 
                     <form th:action="@{/vacationrequests/administrators/approve}" method="post" style="display:inline;">
-                        <input type="hidden" name="requestID" th:value="${requestID}"/>
+                        <input type="hidden" name="vacationRequestID" th:value="${vr.vacationRequestID}"/>
                         <button type="submit">Deny</button>
                     </form>
                 </td>

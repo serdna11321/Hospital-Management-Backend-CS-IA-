@@ -63,7 +63,7 @@ public class VacationRequestService {
     }
 
     @Transactional
-    public VacationRequest approveVacationRequest(EvaluateVacationRequestDTO request){
+    public VacationRequest approveVacationRequest(EvaluateVacationRequestDTO request) {
         Optional<VacationRequest> optionalVacationRequest = vacationRequestRepository.findByVacationRequestID(request.getVacationRequestID());
         if (optionalVacationRequest.isEmpty()) throw new RuntimeException("Vacation Request does not exist");
         VacationRequest vacationRequest = optionalVacationRequest.get();

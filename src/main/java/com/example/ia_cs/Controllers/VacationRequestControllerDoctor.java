@@ -22,15 +22,21 @@ public class VacationRequestControllerDoctor {
     }
 
     @GetMapping
-    public String showVacationRequestsDoctor(Model model){
+    public String showVacationRequestsDoctor(Model model, Authentication authentication) {
         model.addAttribute("requestVacation", new CreateVacationRequestDTO());
-        return "/vacationRequests/doctors/index";
+        model.addAttribute("vacationHistory",
+                vacationRequestService.getHistoryForUser(getUserID(authentication)));
+        return "vacationRequests/doctors/index";
     }
 
-    @PostMapping
-    public String requestVacation(@ModelAttribute("requestVacation") CreateVacationRequestDTO request, Authentication authentication){
+    private long getUserID(Authentication authentication) {
         Jwt jwt = (Jwt) authentication.getPrincipal();
-        long userID = jwt.getClaim("userID");
+        return ((Number) jwt.getClaim("userID")).longValue();
+    }
+
+    @PostMapping("/requestVacation")
+    public String requestVacation(@ModelAttribute("requestVacation") CreateVacationRequestDTO request, Authentication authentication){
+        long userID = getUserID(authentication);
         vacationRequestService.requestVacation(request, userID);
         return "redirect:/vacationRequests/doctors";
     }

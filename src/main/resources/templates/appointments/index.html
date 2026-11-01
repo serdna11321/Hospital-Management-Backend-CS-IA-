@@ -96,10 +96,10 @@
                 </thead>
                 <tbody>
                 <tr th:each="appointment : ${appointments}">
-                    <td th:text="appointment.appointmentDate"></td>
-                    <td th:text="appointment.appointmentTime"></td>
-                    <td th:text="appointment.patient"></td>
-                    <td th:text="appointment.status"></td>
+                    <td th:text="${#temporals.format(appointment.appointmentDateTime, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(appointment.appointmentDateTime, 'HH:mm')}"></td>
+                    <td th:text="${appointment.patient.firstName + ' ' + appointment.patient.lastName}"></td>
+                    <td th:text="${appointment.status}"></td>
                 </tr>
                 </tbody>
             </table>

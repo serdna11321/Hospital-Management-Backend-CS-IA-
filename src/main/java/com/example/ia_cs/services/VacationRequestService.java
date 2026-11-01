@@ -3,14 +3,12 @@ package com.example.ia_cs.services;
 import com.example.ia_cs.dataTransferObjects.PeriodicUpdateDTOs.RescheduledAppointmentDTO;
 import com.example.ia_cs.dataTransferObjects.VacationRequestControllerDTOs.EvaluateVacationRequestDTO;
 import com.example.ia_cs.dataTransferObjects.VacationRequestControllerDTOs.CreateVacationRequestDTO;
-import com.example.ia_cs.entities.Appointment;
-import com.example.ia_cs.entities.Doctor;
-import com.example.ia_cs.entities.VacationRequest;
-import com.example.ia_cs.entities.VacationRequestStatus;
+import com.example.ia_cs.entities.*;
 import com.example.ia_cs.repositories.AppointmentRepository;
 import com.example.ia_cs.repositories.DoctorRepository;
 import com.example.ia_cs.repositories.UserRepository;
 import com.example.ia_cs.repositories.VacationRequestRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -37,6 +35,7 @@ public class VacationRequestService {
         this.appointmentService = appointmentService;
     }
 
+    @Transactional
     public VacationRequest requestVacation(CreateVacationRequestDTO request, long userID){
         Optional<Doctor> optionalDoctor = doctorRepository.findByPersonPersonID(userRepository.findByUserID(userID).get().getPerson().getPersonID());
         if (optionalDoctor.isEmpty()) throw new RuntimeException("Doctor does not exist");
@@ -49,10 +48,11 @@ public class VacationRequestService {
         VacationRequest vacationRequest = new VacationRequest();
         vacationRequest.setDoctor(doctor);
         vacationRequest.setStartDate(startDate);
+        vacationRequest.setEndDate(endDate);
         vacationRequest.setStatus(VacationRequestStatus.PENDING);
-
-         markAffectedAppointments(doctor, startDate, endDate, vacationRequest);
-         return vacationRequest;
+        vacationRequestRepository.save(vacationRequest);
+        markAffectedAppointments(doctor, startDate, endDate, vacationRequest);
+        return vacationRequest;
     }
 
     public void markAffectedAppointments(Doctor doctor, LocalDate startDate, LocalDate endDate, VacationRequest vacationRequest){
@@ -62,6 +62,7 @@ public class VacationRequestService {
         }
     }
 
+    @Transactional
     public VacationRequest approveVacationRequest(EvaluateVacationRequestDTO request){
         Optional<VacationRequest> optionalVacationRequest = vacationRequestRepository.findByVacationRequestID(request.getVacationRequestID());
         if (optionalVacationRequest.isEmpty()) throw new RuntimeException("Vacation Request does not exist");
@@ -71,6 +72,7 @@ public class VacationRequestService {
         return vacationRequest;
     }
 
+    @Transactional
     public VacationRequest denyVacationRequest(EvaluateVacationRequestDTO request){
         Optional<VacationRequest> optionalVacationRequest = vacationRequestRepository.findByVacationRequestID(request.getVacationRequestID());
         if (optionalVacationRequest.isEmpty()) throw new RuntimeException("Vacation Request does not exist");
@@ -80,6 +82,7 @@ public class VacationRequestService {
         return vacationRequest;
     }
 
+    @Transactional
     public void rescheduleAffectedAppointments(VacationRequest vacationRequest){
         for (Appointment appointment : appointmentRepository.findByAffectingVacationRequest(vacationRequest)){
             RescheduledAppointmentDTO rescheduledAppointmentDTO = new RescheduledAppointmentDTO();
@@ -113,5 +116,11 @@ public class VacationRequestService {
             }
         }
         return false;
+    }
+
+    public List<VacationRequest> getHistoryForUser(long userID){
+        User user = userRepository.findByUserID(userID).get();
+        Doctor doctor = doctorRepository.findByPersonPersonID(user.getPerson().getPersonID()).get();
+        return vacationRequestRepository.findByDoctor(doctor);
     }
 }

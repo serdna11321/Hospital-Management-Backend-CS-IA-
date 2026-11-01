@@ -16,7 +16,7 @@ public class VacationRequest {
     private Long vacationRequestID;
 
     @ManyToOne
-    @JoinColumn(name = "doctorID")
+    @JoinColumn(name = "doctorID", nullable = false)
     private Doctor doctor;
 
     @Column(nullable = false)
@@ -25,7 +25,7 @@ public class VacationRequest {
     @Column(nullable = false)
     private LocalDate endDate;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private VacationRequestStatus status;
 }

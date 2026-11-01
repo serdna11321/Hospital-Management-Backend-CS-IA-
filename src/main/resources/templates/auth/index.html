@@ -5,7 +5,10 @@
 </head>
 <body>
 
-    <main>
+<div th:replace="~{fragments/layout :: navbar}"></div>
+
+
+<main>
         <div th:if="${error}" style="color: red;">
             <p th:text="${error}"></p>
         </div>

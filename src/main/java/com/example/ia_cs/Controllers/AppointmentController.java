@@ -3,6 +3,7 @@ package com.example.ia_cs.Controllers;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CancelAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.ChangeAppointmentRequestDTO;
 import com.example.ia_cs.dataTransferObjects.AppointmentControllerDTOs.CreateAppointmentRequestDTO;
+import com.example.ia_cs.entities.Appointment;
 import com.example.ia_cs.repositories.AppointmentRepository;
 import com.example.ia_cs.repositories.DoctorRepository;
 import com.example.ia_cs.services.AppointmentService;
@@ -13,6 +14,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/appointments")
@@ -32,10 +37,8 @@ public class AppointmentController {
                                        Model model) {
 
         long userID = getUserID(authentication);
-        boolean isDoctor = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_DOCTOR"));
-
-        model.addAttribute("appointments", appointmentService.getAppointmentsByUserID(userID));
+        List<Appointment> appointments = appointmentService.getAppointmentsByUserID(userID);
+        model.addAttribute("appointments", appointments);
 
         CreateAppointmentRequestDTO createRequest = new CreateAppointmentRequestDTO();
         createRequest.setDoctorID(selectedDoctorID);          // field must be Long, not long
@@ -49,6 +52,13 @@ public class AppointmentController {
                 selectedDoctorID != null
                         ? appointmentService.getAvailableSlots(LocalDate.now(), selectedDoctorID)
                         : java.util.List.of());
+        Map<Long, List<LocalDateTime>> slotsByDoctor = new HashMap<>();
+        for (Appointment a : appointments) {
+            Long docId = a.getDoctor().getDoctorID();
+            slotsByDoctor.computeIfAbsent(docId,
+                    id -> appointmentService.getAvailableSlots(LocalDate.now(), id));
+        }
+        model.addAttribute("slotsByDoctor", slotsByDoctor);
 
         return "appointments/index";
     }

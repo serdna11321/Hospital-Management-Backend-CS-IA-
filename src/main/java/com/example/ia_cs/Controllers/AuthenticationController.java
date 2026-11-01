@@ -27,6 +27,7 @@ public class AuthenticationController {
     @GetMapping
     public String showAuthenticationPage(Model model) {
         model.addAttribute("login", new LoginRequestDTO());
+        model.addAttribute("logout");
         return "auth/index";
     }
 
@@ -56,5 +57,16 @@ public class AuthenticationController {
             model.addAttribute("error", e.getMessage());
             return "auth/index";
         }
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpServletResponse response) {
+        Cookie jwtCookie = new Cookie("JWT_TOKEN", "");
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(false);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0);
+        response.addCookie(jwtCookie);
+        return "redirect:/auth";
     }
 }

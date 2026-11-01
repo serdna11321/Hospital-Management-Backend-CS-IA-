@@ -3,7 +3,7 @@
 <head th:replace="~{fragments/layout :: head('Administrator - Vacation Requests')}"></head>
 <body sec:authorize="hasRole('ADMINISTRATOR')">
 
-<div th:replace="~{fragments/layout :: navbarAdmin}"></div>
+<div th:replace="~{fragments/layout :: navbar}"></div>
 
 <main>
     <h1>Vacation Requests</h1>
@@ -30,7 +30,7 @@
                         <button type="submit">Approve</button>
                     </form>
 
-                    <form th:action="@{/vacationrequests/administrators/approve}" method="post" style="display:inline;">
+                    <form th:action="@{/vacationRequests/administrators/deny}" method="post" style="display:inline;">
                         <input type="hidden" name="vacationRequestID" th:value="${vr.vacationRequestID}"/>
                         <button type="submit">Deny</button>
                     </form>

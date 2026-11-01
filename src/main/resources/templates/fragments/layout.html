@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,32 +9,39 @@
 </head>
 <body>
 
-<!-- Shared Navigation Bar -->
-<nav th:fragment="navbarPatient" class="navbar" style="align-items: center">
+<nav th:fragment="navbar">
     <ul>
-        <li><a th:href="@{/appointments}">Appointments</a></li>
+        <li><strong>Clinic</strong></li>
     </ul>
     <ul>
-        <li><a th:href="@{/auth}">Logout</a></li>
+        <li sec:authorize="hasRole('PATIENT')">
+            <a th:href="@{/appointments}">My Appointments</a>
+        </li>
+
+        <li sec:authorize="hasRole('DOCTOR')">
+            <a th:href="@{/appointments}">My Schedule</a>
+        </li>
+        <li sec:authorize="hasRole('DOCTOR')">
+            <a th:href="@{/vacationRequests/doctors}">Request Vacation</a>
+        </li>
+
+        <li sec:authorize="hasRole('ADMINISTRATOR')">
+            <a th:href="@{/users/administrators}">Manage Doctor and Administrators</a>
+        </li>
+        <li sec:authorize="hasRole('ADMINISTRATOR')">
+            <a th:href="@{/vacationRequests/administrators}">Vacation Requests</a>
+        </li>
+
+        <li sec:authorize="isAuthenticated()">
+            <form th:action="@{/auth/logout}" method="post" style="margin:0">
+                <button type="submit" class="secondary outline">Logout</button>
+            </form>
+        </li>
+
+        <li sec:authorize="!isAuthenticated()">
+            <a th:href="@{/auth}">Login</a>
+        </li>
     </ul>
 </nav>
-
-<nav th:fragment="navbarDoctor" class="navbar" style="align-items: center">
-    <a th:href="@{/appointments}">Appointments</a> |
-    <a th:href="@{/vacationRequests/doctors}">Vacations</a> |
-    <a th:href="@{/auth}">Logout</a>
-</nav>
-
-<nav th:fragment="navbarAdmin" class="navbar" style="align-items: center">
-    <a th:href="@{/vacationRequests/administrators}">Admin Vacations</a> |
-    <a th:href="@{/auth}">Logout</a>
-</nav>
-
-<nav th:fragment="navbarPatientAdmin" class="navbar" style="align-items: center">
-    <a th:href="@{/appointments}">Appointments</a> |
-    <a th:href="@{/vacationRequests/administrators}">Vacations</a> |
-    <a th:href="@{/auth}">Logout</a>
-</nav>
-
 </body>
 </html>

@@ -4,11 +4,8 @@
 <head th:replace="~{fragments/layout :: head(Appointments)}"></head>
 
 <body>
-    <th:block sec:authorize="hasRole('PATIENT')">
-        <div th:replace="~{fragments/layout :: navbarPatient}"></div>
-    </th:block>
-    <div sec:authorize="hasRole('DOCTOR')" th:replace="~{fragments/layout :: navbarDoctor}"></div>
 
+    <div th:replace="~{fragments/layout :: navbar}"></div>
     <main>
         <div sec:authorize="hasRole('PATIENT')">
         <h1>Your Appointments</h1>
@@ -29,16 +26,18 @@
                 <td th:text="${#temporals.format(appointment.appointmentDateTime, 'HH:mm')}"></td>
                 <td th:text="${appointment.doctor.firstName + ' ' + appointment.doctor.lastName}"></td>
                 <td th:text="${appointment.status}"></td>
-                    <td>
-                        <form th:action="@{appointments/update}" method="post">
-                            <form th:action="@{/appointments/update}" method="post">
-                                <input type="hidden" name="appointmentID" th:value="${appointment.appointmentID}"/>
-                                <label for="newDateTime">New Date and Time</label>
-                                <input id="newDateTime" type="datetime-local" name="dateTime" required/>
-                                <button type="submit">Submit Request</button>
-                            </form>
-                        </form>
-                    </td>
+                <td>
+                    <form th:action="@{/appointments/update}" method="post">
+                        <input type="hidden" name="appointmentID" th:value="${appointment.appointmentID}"/>
+                        <select name="newAppointmentDateTime" required>
+                            <option value="">-- Select new slot --</option>
+                            <option th:each="slot : ${slotsByDoctor[appointment.doctor.doctorID]}"
+                                    th:value="${slot}"
+                                    th:text="${#temporals.format(slot, 'EEE, MMM d - HH:mm')}"></option>
+                        </select>
+                        <button type="submit">Submit Request</button>
+                    </form>
+                </td>
                     <td>
                         <form th:action="@{/appointments/cancel}" method="post">
                             <input type="hidden" name="appointmentID" th:value="${appointment.appointmentID}"/>

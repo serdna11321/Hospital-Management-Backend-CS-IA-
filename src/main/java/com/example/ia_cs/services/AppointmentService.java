@@ -137,7 +137,7 @@ public class AppointmentService {
     }
 
     public boolean isTimeSlotOccupied(Doctor doctor, Patient patient, LocalDateTime dateTime){
-        return !((appointmentRepository.existsByDoctorAndAppointmentDateTimeAndStatus(doctor, dateTime, AppointmentStatus.BOOKED)) || (appointmentRepository.existsByPatientAndAppointmentDateTimeAndStatus(patient, dateTime, AppointmentStatus.BOOKED)) || (vacationRequestRepository.existsVacationRequestByDateAndStatus(LocalDate.from(dateTime), VacationRequestStatus.APPROVED)));
+        return ((appointmentRepository.existsByDoctorAndAppointmentDateTimeAndStatus(doctor, dateTime, AppointmentStatus.BOOKED)) || (appointmentRepository.existsByPatientAndAppointmentDateTimeAndStatus(patient, dateTime, AppointmentStatus.BOOKED)) || (vacationRequestRepository.existsVacationRequestByDateAndStatus(doctor, LocalDate.from(dateTime),  VacationRequestStatus.APPROVED)));
     }
 
     public LocalDateTime findNextAvailableDateTime(Doctor doctor){

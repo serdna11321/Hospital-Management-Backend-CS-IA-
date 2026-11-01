@@ -13,15 +13,11 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
-import javax.crypto.SecretKey;
 import java.util.Arrays;
 
 @Configuration
@@ -50,8 +46,8 @@ public class SecurityConfiguration {
                         .requestMatchers("/appointments/**").hasRole("PATIENT")
                         .requestMatchers("/users/patients/**").permitAll()
                         .requestMatchers("/users/administrators/**").hasRole("ADMINISTRATOR")
-                        .requestMatchers("/vacationRequests/doctors/**").hasRole("DOCTOR")
-                        .requestMatchers("/vacationRequests/administrators/**").hasRole("ADMINISTRATOR")
+                        .requestMatchers("/templates/vacationRequests/doctors/**").hasRole("DOCTOR")
+                        .requestMatchers("/templates/vacationRequests/administrators/**").hasRole("ADMINISTRATOR")
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/**", "/error/**").permitAll()
                         .anyRequest().authenticated()

@@ -24,14 +24,14 @@ public class VacationRequestControllerDoctor {
     @GetMapping
     public String showVacationRequestsDoctor(Model model){
         model.addAttribute("requestVacation", new CreateVacationRequestDTO());
-        return "vacationRequests/doctors/index";
+        return "/vacationRequests/doctors/index";
     }
 
     @PostMapping
     public String requestVacation(@ModelAttribute("requestVacation") CreateVacationRequestDTO request, Authentication authentication){
         Jwt jwt = (Jwt) authentication.getPrincipal();
         long userID = jwt.getClaim("userID");
-        VacationRequest vacationRequest = vacationRequestService.requestVacation(request, userID);
+        vacationRequestService.requestVacation(request, userID);
         return "redirect:/vacationRequests/doctors";
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
 @Controller
-@RequestMapping("/vacationRequests/administrators")
+@RequestMapping("/templates/vacationRequests/administrators")
 public class VacationRequestControllerAdministrator {
 
     private final VacationRequestService vacationRequestService;
@@ -19,7 +19,7 @@ public class VacationRequestControllerAdministrator {
     @GetMapping
     public String showVacationRequestsAdmin(Model model){
         model.addAttribute("evaluateRequest", new EvaluateVacationRequestDTO());
-        return "vacationRequests/administrators/index";
+        return "templates/vacationRequests/administrators/index";
     }
 
     @PostMapping("/approve")

@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="~{fragments/layout :: head('Doctor - Request Vacation')}"></head>
+<head th:replace="~{fragments/layout :: head('Request Vacation')}"></head>
 <body sec:authorize="hasRole('DOCTOR')">
 
-<div th:replace="~{fragments/layout :: navbar}"></div>
+<div th:replace="~{fragments/layout :: navbarDoctor}"></div>
 
 <main>
     <h1>Submit Vacation Request</h1>
 
-    <!-- Form bound to CreateVacationRequestDTO -->
     <form th:action="@{/vacationRequests/doctors}" th:object="${requestVacation}" method="post">
         <div>
             <label for="startDate">Start Date:</label>

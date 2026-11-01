@@ -22,6 +22,7 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final List<RescheduledAppointmentDTO> rescheduledAppointmentsDTOs = new ArrayList<>();
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
 
     public void addToRescheduledAppointmentsList(RescheduledAppointmentDTO rescheduledAppointmentDTO){
@@ -32,12 +33,13 @@ public class AppointmentService {
         rescheduledAppointmentsDTOs.remove(rescheduledAppointmentDTO);
     }
 
-    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository,  UserRepository userRepository){
+    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, UserRepository userRepository, RoleRepository roleRepository){
         this.appointmentRepository=appointmentRepository;
         this.vacationRequestRepository = vacationRequestRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     public void requestAppointment(CreateAppointmentRequestDTO request, long userID){
@@ -174,5 +176,26 @@ public class AppointmentService {
             }
         }
         return result;
+    }
+
+    public List<Appointment> getAppointmentsByUserID(long userID){
+        List<Appointment> patientAppointments = new ArrayList<>();
+        List<Appointment> doctorAppointments = new ArrayList<>();
+        Optional<User> optionalUser = userRepository.findByUserID(userID);
+        if (optionalUser.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+        User user = optionalUser.get();
+
+        if (user.getRoles().contains(roleRepository.findByName(RoleName.PATIENT))){
+            Patient patient = patientRepository.findByPersonPersonID(user.getPerson().getPersonID()).get();
+            patientAppointments = appointmentRepository.findByPatient(patient);
+        }
+        if (user.getRoles().contains(roleRepository.findByName(RoleName.DOCTOR))){
+            Doctor doctor = doctorRepository.findByPersonPersonID(user.getPerson().getPersonID()).get();
+            doctorAppointments = appointmentRepository.findByDoctor(doctor);
+        }
+        patientAppointments.addAll(doctorAppointments);
+        return patientAppointments;
     }
 }

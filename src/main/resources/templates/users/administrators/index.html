@@ -9,7 +9,7 @@
 <main>
     <h1>Create Doctor Account</h1>
 
-    <form th:action="@{/users/doctors/createDoctor}" th:object="${createDoctor}" method="post">
+    <form th:action="@{/users/administrators/createDoctor}" th:object="${createDoctor}" method="post">
         <div>
             <label for="firstName">First name</label>
             <input id="firstName" type="text" th:field="*{firstName}" required/>
@@ -54,6 +54,16 @@
         <div>
             <label for="streetNumber">Street Number</label>
             <input id="streetNumber" type="number" th:field="*{streetNumber}" required/>
+        </div>
+
+        <div>
+            <label for="dateOfBirth">Date of Birth</label>
+            <input id="dateOfBirth" type="date" th:field="*{dateOfBirth}" required/>
+        </div>
+
+        <div>
+            <label for="nif">NIF</label>
+            <input id="nif" type="text" th:field="*{nif}" required/>
         </div>
 
         <div>

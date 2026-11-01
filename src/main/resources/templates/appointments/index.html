@@ -4,7 +4,9 @@
 <head th:replace="~{fragments/layout :: head(Appointments)}"></head>
 
 <body>
-    <div sec:authorize="hasRole('PATIENT')" th:replace="~{fragments/layout :: navbarPatient}"></div>
+    <th:block sec:authorize="hasRole('PATIENT')">
+        <div th:replace="~{fragments/layout :: navbarPatient}"></div>
+    </th:block>
     <div sec:authorize="hasRole('DOCTOR')" th:replace="~{fragments/layout :: navbarDoctor}"></div>
 
     <main>
@@ -22,24 +24,24 @@
             </tr>
             </thead>
             <tbody>
-                <tr th:each="appointment : ${appointments}">
-                    <td th:text="appointment.appointmentDate"></td>
-                    <td th:text="appointment.appointmentTime"></td>
-                    <td th:text="appointment.doctor"></td>
-                    <td th:text="appointment.status"></td>
+            <tr th:each="appointment : ${appointments}">
+                <td th:text="${#temporals.format(appointment.appointmentDateTime, 'dd/MM/yyyy')}"></td>
+                <td th:text="${#temporals.format(appointment.appointmentDateTime, 'HH:mm')}"></td>
+                <td th:text="${appointment.doctor.firstName + ' ' + appointment.doctor.lastName}"></td>
+                <td th:text="${appointment.status}"></td>
                     <td>
                         <form th:action="@{appointments/update}" method="post">
-                            <input type="hidden" th:value="${appointmentID}"/>
-                            <label for="UpdateDate">New Date</label>
-                            <input type="date" id="UpdateDate" th:field="*{date}" required/>
-                            <label for="UpdateTime">New Time</label>
-                            <input type="time" id="UpdateTime" th:field="*{time}" required/>
-                            <button type="submit">Submit Request</button>
+                            <form th:action="@{/appointments/update}" method="post">
+                                <input type="hidden" name="appointmentID" th:value="${appointment.appointmentID}"/>
+                                <label for="newDateTime">New Date and Time</label>
+                                <input id="newDateTime" type="datetime-local" name="dateTime" required/>
+                                <button type="submit">Submit Request</button>
+                            </form>
                         </form>
                     </td>
                     <td>
-                        <form>
-                            <input type="hidden" th:value="${appointmentID}"/>
+                        <form th:action="@{/appointments/cancel}" method="post">
+                            <input type="hidden" name="appointmentID" th:value="${appointment.appointmentID}"/>
                             <button type="submit">Cancel Appointment</button>
                         </form>
                     </td>
@@ -51,14 +53,14 @@
             <form th:action="@{/appointments/create}" th:object="${createRequest}" method="post">
 
                 <div>
-                    <label for="doctorId">Doctor:</label>
-                    <select id="doctorId" th:field="*{doctorID}"
+                    <label for="doctorID">Doctor:</label>
+                    <select id="doctorID" name="doctorID"
                             onchange="if(this.value) window.location.href='/appointments?selectedDoctorID=' + this.value;" required>
                         <option value="">-- Select a Doctor --</option>
                         <option th:each="doc : ${doctors}"
-                                th:value="${doc.id}"
-                                th:selected="${doc.id == selectedDoctorId}"
-                                th:text="${'Dr. ' + doc.firstName + ' ' + doc.lastName}">
+                                th:value="${doc.doctorID}"
+                                th:text="${doc.firstName + ' ' + doc.lastName}"
+                                th:selected="${doc.doctorID == selectedDoctorID}">
                         </option>
                     </select>
                 </div>

@@ -30,5 +30,11 @@
     <a th:href="@{/auth}">Logout</a>
 </nav>
 
+<nav th:fragment="navbarPatientAdmin" class="navbar" style="align-items: center">
+    <a th:href="@{/appointments}">Appointments</a> |
+    <a th:href="@{/vacationRequests/administrators}">Vacations</a> |
+    <a th:href="@{/auth}">Logout</a>
+</nav>
+
 </body>
 </html>

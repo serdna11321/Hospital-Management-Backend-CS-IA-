@@ -50,8 +50,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/templates/vacationRequests/administrators/**").hasRole("ADMINISTRATOR")
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/**", "/error/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(cookieBearerTokenResolver())
                         .authenticationEntryPoint((req, res, ex) -> res.sendRedirect("/auth"))
@@ -62,7 +61,7 @@ public class SecurityConfiguration {
     private JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter authorities = new JwtGrantedAuthoritiesConverter();
         authorities.setAuthoritiesClaimName("roles");
-        authorities.setAuthorityPrefix("");   // values already start with ROLE_
+        authorities.setAuthorityPrefix("");
 
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(authorities);

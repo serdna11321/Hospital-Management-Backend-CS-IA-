@@ -15,7 +15,8 @@ public class VacationRequestControllerAdministrator {
     private final VacationRequestService vacationRequestService;
     private final VacationRequestRepository vacationRequestRepository;
 
-    public VacationRequestControllerAdministrator(VacationRequestService vacationRequestService, VacationRequestRepository vacationRequestRepository) {
+    public VacationRequestControllerAdministrator(VacationRequestService vacationRequestService,
+                                                  VacationRequestRepository vacationRequestRepository) {
         this.vacationRequestService = vacationRequestService;
         this.vacationRequestRepository = vacationRequestRepository;
     }

@@ -42,10 +42,10 @@ public class AuthenticationController {
             String token = jwtService.createToken(authentication);
 
             Cookie jwtCookie = new Cookie("JWT_TOKEN", token);
-            jwtCookie.setHttpOnly(true);  // Prevents XSS script access
-            jwtCookie.setSecure(false);   // Set to true if using HTTPS
-            jwtCookie.setPath("/");       // Available across the entire application
-            jwtCookie.setMaxAge(86400);   // Expiration in seconds (1 day)
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(false);
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(86400);
 
             response.addCookie(jwtCookie);
 

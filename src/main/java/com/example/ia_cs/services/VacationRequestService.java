@@ -27,7 +27,8 @@ public class VacationRequestService {
     private final AppointmentService appointmentService;
 
 
-    public VacationRequestService(VacationRequestRepository vacationRequestRepository, AppointmentRepository appointmentRepository, DoctorRepository doctorRepository, UserRepository userRepository, AppointmentService appointmentService) {
+    public VacationRequestService(VacationRequestRepository vacationRequestRepository, AppointmentRepository appointmentRepository,
+                                  DoctorRepository doctorRepository, UserRepository userRepository, AppointmentService appointmentService) {
         this.vacationRequestRepository = vacationRequestRepository;
         this.appointmentRepository = appointmentRepository;
         this.doctorRepository = doctorRepository;
@@ -99,7 +100,8 @@ public class VacationRequestService {
     }
 
     public void removeAppointmentsFromAffectedAppointments(VacationRequest vacationRequest){
-        List<Appointment> affectedAppointments = appointmentRepository.findByDoctorBetweenDateTimes(vacationRequest.getDoctor(), LocalDateTime.of(vacationRequest.getStartDate(), LocalTime.MIN), LocalDateTime.of(vacationRequest.getEndDate(), LocalTime.MAX));
+        List<Appointment> affectedAppointments = appointmentRepository.findByDoctorBetweenDateTimes(vacationRequest.getDoctor(),
+                LocalDateTime.of(vacationRequest.getStartDate(), LocalTime.MIN), LocalDateTime.of(vacationRequest.getEndDate(), LocalTime.MAX));
         for (Appointment appointment : affectedAppointments){
             appointment.setAffectingVacationRequest(null);
         }
@@ -108,7 +110,8 @@ public class VacationRequestService {
     private boolean existsVacationRequestBetweenDatesAndNotStatusAndDoctor(VacationRequestStatus status, Doctor doctor, LocalDate startDate, LocalDate endDate){
         for (VacationRequest vacationRequest : vacationRequestRepository.findAll()){
             if (vacationRequest.getDoctor() == doctor) {
-                if (vacationRequest.getStartDate().isAfter(startDate) && vacationRequest.getStartDate().isBefore(endDate) || vacationRequest.getStartDate().isBefore(startDate) && vacationRequest.getEndDate().isAfter(startDate)){
+                if (vacationRequest.getStartDate().isAfter(startDate) && vacationRequest.getStartDate().isBefore(endDate)
+                        || vacationRequest.getStartDate().isBefore(startDate) && vacationRequest.getEndDate().isAfter(startDate)){
                     if (vacationRequest.getStatus()!=status){
                         return true;
                     }

@@ -26,7 +26,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
     private final DoctorRepository doctorRepository;
 
-    public AppointmentController(AppointmentService appointmentService, DoctorRepository doctorRepository, AppointmentRepository appointmentRepository) {
+    public AppointmentController(AppointmentService appointmentService, DoctorRepository doctorRepository) {
         this.appointmentService = appointmentService;
         this.doctorRepository = doctorRepository;
     }

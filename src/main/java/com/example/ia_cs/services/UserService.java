@@ -20,7 +20,8 @@ public class UserService {
     private final AdministratorRepository administratorRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PersonRepository personRepository, PatientRepository patientRepository, RoleRepository roleRepository, DoctorRepository doctorRepository, AdministratorRepository administratorRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PersonRepository personRepository, PatientRepository patientRepository, RoleRepository roleRepository,
+                       DoctorRepository doctorRepository, AdministratorRepository administratorRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.personRepository = personRepository;
         this.patientRepository = patientRepository;

@@ -25,15 +25,8 @@ public class AppointmentService {
     private final RoleRepository roleRepository;
 
 
-    public void addToRescheduledAppointmentsList(RescheduledAppointmentDTO rescheduledAppointmentDTO){
-        rescheduledAppointmentsDTOs.add(rescheduledAppointmentDTO);
-    }
-
-    public void removeFromRescheduledAppointmentsList(RescheduledAppointmentDTO rescheduledAppointmentDTO){
-        rescheduledAppointmentsDTOs.remove(rescheduledAppointmentDTO);
-    }
-
-    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, UserRepository userRepository, RoleRepository roleRepository){
+    public AppointmentService(AppointmentRepository appointmentRepository, VacationRequestRepository vacationRequestRepository, DoctorRepository doctorRepository,
+                              PatientRepository patientRepository, UserRepository userRepository, RoleRepository roleRepository){
         this.appointmentRepository=appointmentRepository;
         this.vacationRequestRepository = vacationRequestRepository;
         this.doctorRepository = doctorRepository;
@@ -198,4 +191,9 @@ public class AppointmentService {
         patientAppointments.addAll(doctorAppointments);
         return patientAppointments;
     }
+
+    public void addToRescheduledAppointmentsList(RescheduledAppointmentDTO rescheduledAppointmentDTO){
+        rescheduledAppointmentsDTOs.add(rescheduledAppointmentDTO);
+    }
+
 }
